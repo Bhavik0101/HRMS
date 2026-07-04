@@ -4,27 +4,21 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../../components/AppLayout';
 import { api, getUser } from '../../lib/api';
+import { Clock, CheckCircle2, UserCheck, ChevronRight, Users, CalendarDays, ArrowRight } from 'lucide-react';
 
-const statusColor = {
-  present: 'bg-present',
-  on_leave: 'bg-onleave',
-  absent: 'bg-absent',
-};
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUserState] = useState(null);
-  const [employees, setEmployees] = useState([]);
-  const [attendanceToday, setAttendanceToday] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [msg, setMsg] = useState('');
+  const [user, setUserState]             = useState(null);
+  const [employees, setEmployees]        = useState([]);
+  const [attendanceToday, setAttToday]   = useState(null);
+  const [loading, setLoading]            = useState(true);
+  const [msg, setMsg]                    = useState('');
+  const [checkInAnim, setCheckInAnim]    = useState(false);
 
   useEffect(() => {
     const u = getUser();
-    if (!u) {
-      router.replace('/signin');
-      return;
-    }
+    if (!u) { router.replace('/signin'); return; }
     setUserState(u);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,111 +33,198 @@ export default function DashboardPage() {
       setEmployees(empData.employees);
       const u = getUser();
       const mine = attData.attendance.find((a) => a.employee_id === u.id);
-      setAttendanceToday(mine || null);
-    } catch (err) {
-      setMsg(err.message);
-    } finally {
-      setLoading(false);
-    }
+      setAttToday(mine || null);
+    } catch (err) { setMsg(err.message); }
+    finally { setLoading(false); }
   }
 
   async function handleCheckIn() {
     try {
+      setCheckInAnim(true);
       await api.checkIn();
-      const u = getUser();
-      u.status = 'present';
+      const u = getUser(); u.status = 'present';
       localStorage.setItem('hrms_user', JSON.stringify(u));
       await load();
-    } catch (err) {
-      setMsg(err.message);
-    }
+    } catch (err) { setMsg(err.message); }
+    finally { setTimeout(() => setCheckInAnim(false), 1000); }
   }
 
   async function handleCheckOut() {
-    try {
-      await api.checkOut();
-      await load();
-    } catch (err) {
-      setMsg(err.message);
-    }
+    try { await api.checkOut(); await load(); }
+    catch (err) { setMsg(err.message); }
   }
 
   if (!user) return null;
   const isAdmin = ['admin', 'hr'].includes(user.role);
+  const now     = new Date();
+  const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
+
+  const statusColors = { present:'#22C55E', on_leave:'#F59E0B', absent:'#EF4444' };
+  const statCards = isAdmin ? [
+    { label: 'Total Employees', value: employees.length, icon: Users, color: '#8B5CF6' },
+    { label: 'Present Today', value: employees.filter(e => e.status === 'present').length, icon: UserCheck, color: '#22C55E' },
+    { label: 'On Leave', value: employees.filter(e => e.status === 'on_leave').length, icon: CalendarDays, color: '#F59E0B' },
+  ] : [];
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="flex items-center justify-between">
+      <div className="mx-auto max-w-6xl px-6 py-8 space-y-8">
+
+        {/* ── Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="font-display text-2xl text-white">
-              Welcome back, {user.first_name}
+            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>
+              {greeting}
+            </p>
+            <h1 className="font-display text-3xl font-bold text-white">
+              {user.first_name} {user.last_name}
             </h1>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-1 text-sm" style={{ color:'var(--t-text-muted)' }}>
               {isAdmin ? 'Here is your team at a glance.' : "Here's your workday summary."}
             </p>
           </div>
 
+          {/* Check-in / Check-out button */}
           <div className="flex items-center gap-3">
             {!attendanceToday?.check_in && (
               <button
                 onClick={handleCheckIn}
-                className="rounded-lg bg-present px-4 py-2 text-sm font-semibold text-black"
+                className={`btn-glow flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-xl ${checkInAnim ? 'scale-95' : ''} transition-transform`}
               >
+                <Clock className="w-4 h-4" />
                 Check In
               </button>
             )}
             {attendanceToday?.check_in && !attendanceToday?.check_out && (
               <button
                 onClick={handleCheckOut}
-                className="rounded-lg bg-onleave px-4 py-2 text-sm font-semibold text-black"
+                className="flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-xl transition-all"
+                style={{
+                  background:'rgba(245,158,11,0.15)',
+                  border:'1px solid rgba(245,158,11,0.3)',
+                  boxShadow:'0 0 14px rgba(245,158,11,0.2)',
+                }}
               >
+                <CheckCircle2 className="w-4 h-4" style={{ color:'#F59E0B' }} />
                 Check Out
               </button>
             )}
             {attendanceToday?.check_out && (
-              <span className="rounded-lg border border-line px-4 py-2 text-sm text-gray-400">
-                Day complete · {attendanceToday.work_hours}h logged
+              <span
+                className="flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium"
+                style={{
+                  background:'rgba(34,197,94,0.1)',
+                  border:'1px solid rgba(34,197,94,0.25)',
+                  color:'#22C55E',
+                  boxShadow:'0 0 12px rgba(34,197,94,0.15)',
+                }}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {attendanceToday.work_hours}h logged
               </span>
             )}
           </div>
         </div>
 
-        {msg && <p className="mt-4 text-sm text-absent">{msg}</p>}
+        {msg && (
+          <div className="rounded-xl px-4 py-2.5 text-sm" style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', color:'#FCA5A5' }}>
+            {msg}
+          </div>
+        )}
 
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <QuickLink href="/profile" title="My Profile" desc="View & edit your details" />
-          <QuickLink href="/attendance" title="Attendance" desc="Daily & weekly records" />
-          <QuickLink href="/timeoff" title="Time Off" desc="Apply & track leave" />
+        {/* ── Admin stat cards ── */}
+        {isAdmin && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {statCards.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div key={s.label} className="glass-card shine-card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{
+                        background:`rgba(${s.color === '#8B5CF6' ? '139,92,246' : s.color === '#22C55E' ? '34,197,94' : '245,158,11'},0.15)`,
+                        boxShadow:`4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.03), 0 0 10px ${s.color}30`,
+                      }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: s.color }} />
+                    </span>
+                    <span className="text-3xl font-bold font-display" style={{ color: s.color }}>
+                      {loading ? '–' : s.value}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium" style={{ color:'var(--t-text-muted)' }}>{s.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Quick links ── */}
+        <div>
+          <h2 className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color:'rgba(192,132,252,0.5)' }}>
+            Quick Access
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <QuickLink href="/profile"    title="My Profile"  desc="View & edit your details"  glow="#8B5CF6" />
+            <QuickLink href="/attendance" title="Attendance"  desc="Daily & weekly records"     glow="#22C55E" />
+            <QuickLink href="/timeoff"    title="Time Off"    desc="Apply & track leave"        glow="#C084FC" />
+          </div>
         </div>
 
+        {/* ── Employees grid (admin) ── */}
         {isAdmin && (
-          <div className="mt-10">
-            <h2 className="mb-4 text-sm uppercase tracking-wide text-gray-500">Employees</h2>
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.5)' }}>
+                Team Members
+              </h2>
+              <a href="/employees" className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-70" style={{ color:'#C084FC' }}>
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
             {loading ? (
-              <p className="text-gray-500">Loading…</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[1,2,3].map(i => (
+                  <div key={i} className="glass-card h-24 animate-pulse" style={{ background:'rgba(139,92,246,0.05)' }} />
+                ))}
+              </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {employees.map((emp) => (
-                  <a
-                    key={emp.id}
-                    href={`/employees/${emp.id}`}
-                    className="relative rounded-xl border border-line bg-panel p-4 shadow-card transition hover:border-accent"
-                  >
-                    <span
-                      className={`status-dot absolute right-4 top-4 ${statusColor[emp.status] || 'bg-gray-500'}`}
-                    />
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent2 text-sm font-semibold text-white">
-                      {emp.first_name?.[0]}
-                      {emp.last_name?.[0]}
-                    </div>
-                    <p className="mt-3 font-medium text-white">
-                      {emp.first_name} {emp.last_name}
-                    </p>
-                    <p className="text-xs text-gray-500">{emp.designation || emp.role}</p>
-                    <p className="text-xs text-gray-600">{emp.login_id}</p>
-                  </a>
-                ))}
+                {employees.slice(0, 6).map((emp) => {
+                  const dotColor = statusColors[emp.status] ?? '#6B7280';
+                  return (
+                    <a
+                      key={emp.id}
+                      href={`/employees/${emp.id}`}
+                      className="glass-card group flex items-center gap-4 p-4"
+                    >
+                      <div className="relative shrink-0">
+                        <div
+                          className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold text-white"
+                          style={{
+                            background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
+                            boxShadow:'3px 3px 8px rgba(0,0,0,0.5), 0 0 10px rgba(139,92,246,0.3)',
+                          }}
+                        >
+                          {emp.first_name?.[0]}{emp.last_name?.[0]}
+                        </div>
+                        <span
+                          className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2"
+                          style={{ background:dotColor, borderColor:'#0d0d14', boxShadow:`0 0 6px ${dotColor}` }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-white truncate">{emp.first_name} {emp.last_name}</p>
+                        <p className="text-xs truncate mt-0.5" style={{ color:'rgba(192,132,252,0.7)' }}>
+                          {emp.designation || emp.role}
+                        </p>
+                        <p className="text-xs truncate" style={{ color:'var(--t-text-dim)' }}>{emp.department}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color:'#8B5CF6' }} />
+                    </a>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -153,11 +234,32 @@ export default function DashboardPage() {
   );
 }
 
-function QuickLink({ href, title, desc }) {
+function QuickLink({ href, title, desc, glow }) {
   return (
-    <a href={href} className="rounded-xl border border-line bg-panel p-5 shadow-card transition hover:border-accent">
-      <p className="font-medium text-white">{title}</p>
-      <p className="mt-1 text-sm text-gray-500">{desc}</p>
+    <a
+      href={href}
+      className="glass-card group flex flex-col justify-between p-5 relative overflow-hidden"
+    >
+      {/* Corner glow */}
+      <div
+        style={{
+          position:'absolute', top:-20, right:-20,
+          width:80, height:80, borderRadius:'50%',
+          background:`radial-gradient(circle, ${glow}25 0%, transparent 70%)`,
+          filter:'blur(8px)',
+          pointerEvents:'none',
+          transition:'opacity 0.3s',
+        }}
+      />
+      <div>
+        <p className="font-display font-semibold text-base text-white">{title}</p>
+        <p className="mt-1 text-sm" style={{ color:'var(--t-text-muted)' }}>{desc}</p>
+      </div>
+      <div className="flex items-center gap-1 mt-4 text-xs font-medium" style={{ color: glow }}>
+        Open <ArrowRight className="w-3.5 h-3.5" />
+      </div>
     </a>
   );
 }
+
+

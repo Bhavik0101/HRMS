@@ -1,28 +1,519 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  background-color: #0E0E12;
-  color: #EDEDF2;
+/* ══════════════════════════════════════════════════════════
+   THEME TOKENS — Dark (default) & Light
+══════════════════════════════════════════════════════════ */
+:root {
+  /* Backgrounds */
+  --t-bg:          #0d0d14;
+  --t-surface:     #15151f;
+  --t-surface2:    #1a1a26;
+  /* Text */
+  --t-text:        #e2e2f0;
+  --t-text-muted:  rgba(226,226,240,0.55);
+  --t-text-dim:    rgba(226,226,240,0.38);
+  --t-text-label:  rgba(192,132,252,0.65);   /* purple label/caption */
+  /* Borders */
+  --t-border:      rgba(139,92,246,0.14);
+  --t-border-hi:   rgba(255,255,255,0.07);
+  /* Glass */
+  --t-glass-bg:    rgba(21,21,31,0.55);
+  --t-glass-sb:    rgba(13,13,20,0.85);
+  --t-glass-input: rgba(10,10,18,0.70);
+  --t-row-bg:      rgba(21,21,31,0.40);
+  --t-row-hover:   rgba(139,92,246,0.06);
+  /* Neumorphism shadows */
+  --t-neum-drk:    rgba(0,0,0,0.55);
+  --t-neum-lit:    rgba(255,255,255,0.03);
+  --t-neum-in-drk: rgba(0,0,0,0.60);
+  --t-neum-in-lit: rgba(255,255,255,0.03);
+  /* Misc */
+  --t-card-shadow: rgba(0,0,0,0.45);
+  --t-date-scheme: dark;
+  --t-code-bg:     rgba(0,0,0,0.3);
+  --t-code-border: rgba(139,92,246,0.2);
 }
 
-* {
-  box-sizing: border-box;
+/* ── Light theme overrides ─────────────────────────── */
+html.light {
+  --t-bg:          #f0eeff;
+  --t-surface:     #f8f6ff;
+  --t-surface2:    #ede8ff;
+  /* HIGH-CONTRAST text for light backgrounds */
+  --t-text:        #1a1228;
+  --t-text-muted:  rgba(26,18,40,0.65);      /* clearly readable */
+  --t-text-dim:    rgba(26,18,40,0.50);      /* still readable, softened */
+  --t-text-label:  rgba(109,40,217,0.8);     /* deeper purple for labels */
+  --t-border:      rgba(139,92,246,0.22);
+  --t-border-hi:   rgba(139,92,246,0.14);
+  --t-glass-bg:    rgba(255,253,255,0.68);
+  --t-glass-sb:    rgba(240,238,255,0.94);
+  --t-glass-input: rgba(255,255,255,0.72);
+  --t-row-bg:      rgba(248,246,255,0.7);
+  --t-row-hover:   rgba(139,92,246,0.08);
+  --t-neum-drk:    rgba(180,168,220,0.55);
+  --t-neum-lit:    rgba(255,255,255,0.95);
+  --t-neum-in-drk: rgba(180,168,220,0.45);
+  --t-neum-in-lit: rgba(255,255,255,0.90);
+  --t-card-shadow: rgba(139,92,246,0.12);
+  --t-date-scheme: light;
+  --t-code-bg:     rgba(109,40,217,0.06);
+  --t-code-border: rgba(109,40,217,0.18);
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+
+
+/* ══════════════════════════════════════════════════════════
+   BASE
+══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* mesh tokens on :root (not overridden in light by mistake) */
+:root {
+  --t-mesh1: rgba(139,92,246,0.12);
+  --t-mesh2: rgba(192,132,252,0.08);
+  --t-mesh3: rgba(139,92,246,0.06);
 }
+html.light {
+  --t-mesh1: rgba(139,92,246,0.08);
+  --t-mesh2: rgba(192,132,252,0.06);
+  --t-mesh3: rgba(139,92,246,0.04);
+}
+
+body {
+  background-color: var(--t-bg);
+  background-image:
+    radial-gradient(ellipse 60% 60% at 10% 0%,   var(--t-mesh1) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 90% 10%,  var(--t-mesh2) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 100%, var(--t-mesh3) 0%, transparent 70%);
+  background-attachment: fixed;
+  color: var(--t-text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT MODE — TAILWIND CLASS OVERRIDES
+   Force gray utility classes to be dark/readable on light bg
+══════════════════════════════════════════════════════════ */
+html.light .text-gray-300 { color: rgba(26,18,40,0.75) !important; }
+html.light .text-gray-400 { color: rgba(26,18,40,0.60) !important; }
+html.light .text-gray-500 { color: rgba(26,18,40,0.50) !important; }
+html.light .text-gray-600 { color: rgba(26,18,40,0.45) !important; }
+/* font-mono text inside tables */
+html.light .font-mono     { color: rgba(26,18,40,0.72) !important; }
+
+
+/* ── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #2A2A34;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #8B5CF6, #C084FC);
+  border-radius: 99px;
 }
 
+/* ══════════════════════════════════════════════════════════
+   NEUMORPHISM
+══════════════════════════════════════════════════════════ */
+.neumorphic {
+  background: var(--t-surface);
+  box-shadow: 6px 6px 16px var(--t-neum-drk), -4px -4px 12px var(--t-neum-lit);
+  border-radius: 16px;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+.neumorphic-inset {
+  background: var(--t-surface2);
+  box-shadow:
+    inset 4px 4px 10px var(--t-neum-in-drk),
+    inset -2px -2px 6px var(--t-neum-in-lit);
+  border-radius: 12px;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+.neumorphic-btn {
+  background: var(--t-surface);
+  box-shadow: 4px 4px 10px var(--t-neum-drk), -2px -2px 8px var(--t-neum-lit);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  color: var(--t-text-muted);
+}
+.neumorphic-btn:hover {
+  box-shadow:
+    6px 6px 14px var(--t-neum-drk),
+    -2px -2px 8px var(--t-neum-lit),
+    0 0 12px rgba(139,92,246,0.2);
+  color: var(--t-text);
+}
+.neumorphic-btn:active {
+  box-shadow:
+    inset 3px 3px 8px var(--t-neum-in-drk),
+    inset -1px -1px 5px var(--t-neum-in-lit);
+}
+
+/* ══════════════════════════════════════════════════════════
+   GLASSMORPHISM
+══════════════════════════════════════════════════════════ */
+.glass {
+  background: var(--t-glass-bg);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--t-border);
+  border-radius: 20px;
+  transition: background 0.35s ease;
+}
+
+.glass-card {
+  background: var(--t-glass-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--t-border-hi);
+  border-top-color: rgba(255,255,255,0.1);
+  border-left-color: var(--t-border-hi);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px var(--t-card-shadow), 0 1px 0 rgba(255,255,255,0.06) inset;
+  transition: all 0.3s ease;
+}
+.glass-card:hover {
+  border-color: rgba(139,92,246,0.28);
+  box-shadow:
+    0 12px 40px var(--t-card-shadow),
+    0 0 20px rgba(139,92,246,0.12),
+    0 1px 0 rgba(255,255,255,0.08) inset;
+  transform: translateY(-1px);
+}
+
+.glass-sidebar {
+  background: var(--t-glass-sb);
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  border-right: 1px solid var(--t-border);
+  transition: background 0.35s ease;
+}
+
+.glass-input {
+  background: var(--t-glass-input);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--t-border-hi);
+  border-radius: 12px;
+  color: var(--t-text);
+  transition: all 0.25s ease;
+}
+.glass-input:focus {
+  border-color: rgba(139,92,246,0.5);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.12), inset 0 0 8px rgba(139,92,246,0.05);
+  outline: none;
+}
+.glass-input::placeholder { color: var(--t-text-dim); }
+
+.glass-table-row {
+  background: var(--t-row-bg);
+  border-bottom: 1px solid var(--t-border);
+  transition: all 0.2s;
+}
+.glass-table-row:hover { background: var(--t-row-hover); }
+
+/* ── Table wrapper ─────────────────────────────────── */
+.glass-table-wrap {
+  background: var(--t-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--t-border);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: background 0.35s ease;
+}
+
+.glass-table-head {
+  background: rgba(139,92,246,0.06);
+  border-bottom: 1px solid var(--t-border);
+}
+
+/* ══════════════════════════════════════════════════════════
+   GRADIENT BUTTON
+══════════════════════════════════════════════════════════ */
+.btn-glow {
+  background: linear-gradient(135deg, #8B5CF6 0%, #C084FC 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(139,92,246,0.4), 0 1px 0 rgba(255,255,255,0.15) inset;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+  border-radius: inherit;
+}
+.btn-glow:hover {
+  box-shadow: 0 6px 24px rgba(139,92,246,0.55), 0 1px 0 rgba(255,255,255,0.2) inset;
+  transform: translateY(-1px);
+}
+.btn-glow:active  { transform: translateY(0); box-shadow: 0 2px 12px rgba(139,92,246,0.4); }
+.btn-glow:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ══════════════════════════════════════════════════════════
+   THEME TOGGLE SWITCH
+══════════════════════════════════════════════════════════ */
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: 99px;
+  transition: all 0.35s ease;
+  background: var(--t-surface2);
+  box-shadow:
+    inset 3px 3px 7px var(--t-neum-in-drk),
+    inset -2px -2px 5px var(--t-neum-in-lit);
+  border: 1px solid var(--t-border);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B5CF6, #C084FC);
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.4), 0 0 8px rgba(139,92,246,0.5);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+}
+
+html.light .theme-toggle-thumb {
+  transform: translateX(24px);
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2), 0 0 10px rgba(251,191,36,0.6);
+}
+
+html.light .theme-toggle-track {
+  background: #ede8ff;
+  box-shadow:
+    inset 3px 3px 7px var(--t-neum-in-drk),
+    inset -2px -2px 5px var(--t-neum-in-lit);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STATUS DOT
+══════════════════════════════════════════════════════════ */
 .status-dot {
   display: inline-block;
-  width: 9px;
-  height: 9px;
+  width: 9px; height: 9px;
   border-radius: 999px;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════════════════ */
+@keyframes float-slow {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33%       { transform: translate(20px,-30px) scale(1.05); }
+  66%       { transform: translate(-15px,15px) scale(0.97); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.7; }
+}
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.aurora-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: float-slow 12s ease-in-out infinite, pulse-glow 6s ease-in-out infinite;
+}
+
+html.light .aurora-orb { opacity: 0.5; }
+
+.animate-in { animation: slide-in-up 0.5s ease forwards; }
+.fade-in    { animation: fade-in 0.4s ease forwards; }
+
+/* ── Shine card ─────────────────────────────────────── */
+.shine-card { position: relative; overflow: hidden; }
+.shine-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  animation: shimmer 4s infinite;
+}
+
+/* ── Nav active ─────────────────────────────────────── */
+.nav-active {
+  background: linear-gradient(90deg, rgba(139,92,246,0.18) 0%, transparent 100%);
+  box-shadow: inset 3px 0 0 #8B5CF6;
+  color: #C084FC;
+}
+
+/* ── Badges ─────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 99px;
+  padding: 2px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+.badge-pending  { background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid rgba(245,158,11,0.3); }
+.badge-approved { background: rgba(34,197,94,0.15);  color: #22C55E; border: 1px solid rgba(34,197,94,0.3);  }
+.badge-rejected { background: rgba(239,68,68,0.15);  color: #EF4444; border: 1px solid rgba(239,68,68,0.3);  }
+.badge-present  { background: rgba(34,197,94,0.15);  color: #22C55E; border: 1px solid rgba(34,197,94,0.3);  }
+.badge-absent   { background: rgba(239,68,68,0.15);  color: #EF4444; border: 1px solid rgba(239,68,68,0.3);  }
+.badge-on-leave { background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid rgba(245,158,11,0.3); }
+
+/* ── Date / Select fixes ────────────────────────────── */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6) sepia(1) hue-rotate(230deg) brightness(1.2);
+  cursor: pointer;
+}
+html.light input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.3) sepia(0.5) hue-rotate(230deg) brightness(0.9);
+}
+input[type="date"], input[type="time"] { color-scheme: var(--t-date-scheme); }
+
+select option {
+  background: var(--t-surface);
+  color: var(--t-text);
+}
+
+/* ── Glow divider ───────────────────────────────────── */
+.glow-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.25), transparent);
+}
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT-THEME MISC OVERRIDES
+══════════════════════════════════════════════════════════ */
+html.light .shine-card::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+}
+html.light .nav-active {
+  background: linear-gradient(90deg, rgba(139,92,246,0.12) 0%, transparent 100%);
+}
+html.light .glow-divider {
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.18), transparent);
+}
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT THEME — COMPREHENSIVE TEXT & ELEMENT OVERRIDES
+══════════════════════════════════════════════════════════ */
+
+/* Headings and body type become dark */
+html.light h1, html.light h2, html.light h3,
+html.light h4, html.light h5, html.light h6 { color: #1a1228; }
+html.light p  { color: rgba(26,18,40,0.72); }
+
+/* .text-white → near-black in light mode */
+html.light .text-white { color: #1a1228 !important; }
+
+/* Table cells */
+html.light td { color: rgba(26,18,40,0.75); }
+
+/* Read-only inputs — visible on light glass bg */
+html.light input[readonly],
+html.light textarea[readonly] {
+  color: rgba(26,18,40,0.70) !important;
+  background: rgba(139,92,246,0.06) !important;
+  border-color: rgba(139,92,246,0.15) !important;
+}
+
+/* Editable inputs in light */
+html.light .glass-input {
+  color: #1a1228;
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(139,92,246,0.22);
+}
+html.light .glass-input::placeholder { color: rgba(26,18,40,0.35); }
+
+/* Select options */
+html.light select option {
+  background: #f8f6ff;
+  color: #1a1228;
+}
+
+/* Table header labels (purple muted — stays purple, no fix needed) */
+
+/* Inner card/panel backgrounds used inline */
+html.light .glass-table-head {
+  background: rgba(139,92,246,0.07);
+}
+
+/* Nav sidebar */
+html.light .glass-sidebar {
+  border-right-color: rgba(139,92,246,0.20);
+}
+
+/* Tailwind gray class overrides */
+html.light .text-gray-300 { color: rgba(26,18,40,0.70) !important; }
+html.light .text-gray-400 { color: rgba(26,18,40,0.58) !important; }
+html.light .text-gray-500 { color: rgba(26,18,40,0.48) !important; }
+html.light .text-gray-600 { color: rgba(26,18,40,0.42) !important; }
+
+/* Monospace (login IDs, attendance dates, times) */
+html.light .font-mono { color: rgba(26,18,40,0.68) !important; }
+
+/* Aurora orbs — subtler in light */
+html.light .aurora-orb { opacity: 0.45; }
+
+/* AppLayout page wrapper */
+html.light [data-applayout] {
+  background: var(--t-bg) !important;
+}
+
+/* Shine shimmer in light */
+html.light .shine-card::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+/* Nav active state */
+html.light .nav-active {
+  background: linear-gradient(90deg, rgba(139,92,246,0.12) 0%, transparent 100%);
+}
+
+/* Glow divider */
+html.light .glow-divider {
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.2), transparent);
 }

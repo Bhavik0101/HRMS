@@ -4,246 +4,283 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../../components/AppLayout';
 import { api, getUser } from '../../lib/api';
-import { LayoutGrid, List, Search } from 'lucide-react';
+import { LayoutGrid, List, Search, Plus, X } from 'lucide-react';
+
+function GlassInput({ label, type = 'text', value, onChange, required = false }) {
+  return (
+    <div>
+      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>
+        {label}
+      </label>
+      <input
+        type={type}
+        className="glass-input w-full px-4 py-2.5 text-sm"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+      />
+    </div>
+  );
+}
+
+function GlassSelect({ label, value, onChange, children }) {
+  return (
+    <div>
+      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>
+        {label}
+      </label>
+      <select
+        className="glass-input w-full px-4 py-2.5 text-sm"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {children}
+      </select>
+    </div>
+  );
+}
 
 export default function EmployeesPage() {
   const router = useRouter();
-  const [user, setUserState] = useState(null);
-  const [employees, setEmployees] = useState([]);
-  const [showNew, setShowNew] = useState(false);
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', role: 'employee', department: '', designation: '', manager_id: '' });
-  const [created, setCreated] = useState(null);
-  const [msg, setMsg] = useState('');
-
-  const [viewMode, setViewMode] = useState('grid');
-  const [search, setSearch] = useState('');
+  const [user, setUserState]       = useState(null);
+  const [employees, setEmployees]  = useState([]);
+  const [showNew, setShowNew]      = useState(false);
+  const [form, setForm]            = useState({ firstName:'', lastName:'', email:'', role:'employee', department:'', designation:'', manager_id:'' });
+  const [created, setCreated]      = useState(null);
+  const [msg, setMsg]              = useState('');
+  const [viewMode, setViewMode]    = useState('grid');
+  const [search, setSearch]        = useState('');
   const [filterDept, setFilterDept] = useState('');
   const [filterRole, setFilterRole] = useState('');
+  const [loading, setLoading]      = useState(true);
 
   useEffect(() => {
     const u = getUser();
-    if (!u) {
-      router.replace('/signin');
-      return;
-    }
+    if (!u) { router.replace('/signin'); return; }
     setUserState(u);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function load() {
+    setLoading(true);
     try {
       const { employees } = await api.listEmployees();
       setEmployees(employees);
-    } catch (err) {
-      setMsg(err.message);
-    }
+    } catch (err) { setMsg(err.message); }
+    finally { setLoading(false); }
   }
 
   async function handleCreate(e) {
     e.preventDefault();
     try {
-      const data = await api.createEmployee({
-        ...form,
-        manager_id: form.manager_id || undefined
-      });
+      const data = await api.createEmployee({ ...form, manager_id: form.manager_id || undefined });
       setCreated(data);
-      setForm({ firstName: '', lastName: '', email: '', role: 'employee', department: '', designation: '', manager_id: '' });
+      setForm({ firstName:'', lastName:'', email:'', role:'employee', department:'', designation:'', manager_id:'' });
+      setShowNew(false);
       load();
-    } catch (err) {
-      setMsg(err.message);
-    }
+    } catch (err) { setMsg(err.message); }
   }
 
   if (!user) return null;
   const isAdmin = ['admin', 'hr'].includes(user.role);
-
   const departments = [...new Set(employees.map(e => e.department).filter(Boolean))];
-  const roles = [...new Set(employees.map(e => e.role).filter(Boolean))];
+  const roles       = [...new Set(employees.map(e => e.role).filter(Boolean))];
 
-  const filteredEmployees = employees.filter(emp => {
+  const filtered = employees.filter(emp => {
     if (filterDept && emp.department !== filterDept) return false;
     if (filterRole && emp.role !== filterRole) return false;
     if (search) {
       const q = search.toLowerCase();
-      if (!emp.first_name?.toLowerCase().includes(q) && 
-          !emp.last_name?.toLowerCase().includes(q) && 
-          !emp.login_id?.toLowerCase().includes(q)) {
-        return false;
-      }
+      if (!emp.first_name?.toLowerCase().includes(q) &&
+          !emp.last_name?.toLowerCase().includes(q) &&
+          !emp.login_id?.toLowerCase().includes(q)) return false;
     }
     return true;
   });
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="font-display text-3xl text-white">Employee Directory</h1>
+      <div className="mx-auto max-w-6xl px-6 py-8 space-y-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>People</p>
+            <h1 className="font-display text-3xl font-bold text-white">Employee Directory</h1>
+          </div>
           {isAdmin && (
             <button
-              onClick={() => setShowNew((v) => !v)}
-              className="rounded-lg bg-gradient-to-r from-accent to-accent2 px-5 py-2.5 text-sm font-semibold text-white shadow-lg"
+              onClick={() => { setShowNew(v => !v); setCreated(null); }}
+              className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all ${showNew ? '' : 'btn-glow text-white'}`}
+              style={showNew ? {
+                background:'rgba(239,68,68,0.1)',
+                border:'1px solid rgba(239,68,68,0.25)',
+                color:'#FCA5A5',
+              } : undefined}
             >
-              {showNew ? 'Close Form' : '+ New Employee'}
+              {showNew ? <><X className="w-4 h-4" />Close</> : <><Plus className="w-4 h-4" />New Employee</>}
             </button>
           )}
         </div>
 
-        {msg && <p className="mb-4 text-sm text-absent">{msg}</p>}
+        {msg && (
+          <div className="rounded-xl px-4 py-2.5 text-sm" style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', color:'#FCA5A5' }}>
+            {msg}
+          </div>
+        )}
 
+        {/* Create form */}
         {showNew && (
-          <form onSubmit={handleCreate} className="mb-8 grid grid-cols-1 gap-4 rounded-xl border border-line bg-panel p-6 sm:grid-cols-2">
-            <h2 className="sm:col-span-2 text-lg font-medium text-white mb-2">Create New Employee</h2>
-            <Field label="First Name" value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} required />
-            <Field label="Last Name" value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} required />
-            <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
-            <div>
-              <label className="text-xs uppercase tracking-wide text-gray-500 block mb-1">Role</label>
-              <select
-                className="w-full rounded-lg border border-line bg-panel2 px-3 py-2 text-sm text-white outline-none focus:border-accent"
-                value={form.role}
-                onChange={(e) => setForm({ ...form, role: e.target.value })}
-              >
+          <div className="glass-card p-6 animate-in">
+            <h2 className="font-display text-lg font-semibold text-white mb-5">Create New Employee</h2>
+            <form onSubmit={handleCreate} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <GlassInput label="First Name" value={form.firstName} onChange={(v) => setForm({...form, firstName:v})} required />
+              <GlassInput label="Last Name"  value={form.lastName}  onChange={(v) => setForm({...form, lastName:v})}  required />
+              <GlassInput label="Email" type="email" value={form.email} onChange={(v) => setForm({...form, email:v})} required />
+              <GlassSelect label="Role" value={form.role} onChange={(v) => setForm({...form, role:v})}>
                 <option value="employee">Employee</option>
                 <option value="hr">HR Officer</option>
                 <option value="admin">Admin</option>
-              </select>
-            </div>
-            <Field label="Department" value={form.department} onChange={(v) => setForm({ ...form, department: v })} />
-            <Field label="Designation" value={form.designation} onChange={(v) => setForm({ ...form, designation: v })} />
-            <div>
-              <label className="text-xs uppercase tracking-wide text-gray-500 block mb-1">Manager</label>
-              <select
-                className="w-full rounded-lg border border-line bg-panel2 px-3 py-2 text-sm text-white outline-none focus:border-accent"
-                value={form.manager_id}
-                onChange={(e) => setForm({ ...form, manager_id: e.target.value })}
-              >
+              </GlassSelect>
+              <GlassInput label="Department"  value={form.department}  onChange={(v) => setForm({...form, department:v})} />
+              <GlassInput label="Designation" value={form.designation} onChange={(v) => setForm({...form, designation:v})} />
+              <GlassSelect label="Manager" value={form.manager_id} onChange={(v) => setForm({...form, manager_id:v})}>
                 <option value="">None</option>
-                {employees.map(e => (
-                  <option key={e.id} value={e.id}>{e.first_name} {e.last_name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="sm:col-span-2 mt-2">
-              <button className="rounded-lg bg-gradient-to-r from-accent to-accent2 px-6 py-2.5 text-sm font-semibold text-white">
-                Create Employee
-              </button>
-            </div>
-          </form>
+                {employees.map(e => <option key={e.id} value={e.id}>{e.first_name} {e.last_name}</option>)}
+              </GlassSelect>
+              <div className="sm:col-span-2 flex justify-end mt-2">
+                <button type="submit" className="btn-glow px-7 py-2.5 text-sm font-semibold text-white rounded-xl">
+                  Create Employee
+                </button>
+              </div>
+            </form>
+          </div>
         )}
 
+        {/* Created credentials */}
         {created && (
-          <div className="mb-8 rounded-lg border border-accent/40 bg-accent/10 p-5 text-sm text-gray-200 shadow-inner">
-            <p className="font-medium text-white mb-2">Employee created successfully!</p>
-            Please share these system-generated credentials with them securely:
-            <div className="mt-3 font-mono text-accent2 bg-panel2 p-3 rounded border border-line inline-block">
-              Login ID: {created.loginId} &nbsp;·&nbsp; Temp Password: {created.temporaryPassword}
+          <div className="glass-card p-5 animate-in" style={{ border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.07)' }}>
+            <p className="font-semibold text-white mb-2">✓ Employee created successfully!</p>
+            <p className="text-sm mb-3" style={{ color:'var(--t-text-muted)' }}>
+              Share these credentials securely:
+            </p>
+            <div className="flex items-center gap-4 font-mono text-sm rounded-xl p-4"
+              style={{ background:'var(--t-code-bg)', border:'1px solid var(--t-code-border)', color:'#C084FC' }}>
+              <span>Login ID: <strong>{created.loginId}</strong></span>
+              <span style={{ color:'rgba(255,255,255,0.2)' }}>·</span>
+              <span>Password: <strong>{created.temporaryPassword}</strong></span>
             </div>
           </div>
         )}
 
-        {/* Filters and Search */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-6 bg-panel p-3 rounded-xl border border-line">
-          <div className="flex gap-4 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        {/* Filters */}
+        <div className="glass-card p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-1 gap-3 w-full">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'rgba(139,92,246,0.5)' }} />
               <input
                 type="text"
-                placeholder="Search employees..."
-                className="w-full bg-panel2 border border-line rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-accent outline-none"
+                placeholder="Search employees…"
+                className="glass-input w-full pl-10 pr-4 py-2.5 text-sm"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
-            <select
-              className="bg-panel2 border border-line rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none"
-              value={filterDept}
-              onChange={e => setFilterDept(e.target.value)}
-            >
-              <option value="">All Departments</option>
+            <select className="glass-input px-4 py-2.5 text-sm" value={filterDept} onChange={e => setFilterDept(e.target.value)}>
+              <option value="">All Depts</option>
               {departments.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
-            <select
-              className="bg-panel2 border border-line rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none capitalize"
-              value={filterRole}
-              onChange={e => setFilterRole(e.target.value)}
-            >
+            <select className="glass-input px-4 py-2.5 text-sm capitalize" value={filterRole} onChange={e => setFilterRole(e.target.value)}>
               <option value="">All Roles</option>
               {roles.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
-          
-          <div className="flex bg-panel2 rounded-lg p-1 border border-line shrink-0">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-md transition ${viewMode === 'grid' ? 'bg-panel text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-md transition ${viewMode === 'list' ? 'bg-panel text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}
-            >
-              <List className="w-4 h-4" />
-            </button>
+
+          {/* View toggle */}
+          <div className="flex rounded-xl p-1 gap-1 shrink-0"
+            style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
+            {['grid','list'].map(m => (
+              <button
+                key={m}
+                onClick={() => setViewMode(m)}
+                className="p-2 rounded-lg transition-all"
+                style={viewMode === m ? {
+                  background:'rgba(139,92,246,0.2)',
+                  boxShadow:'inset 2px 2px 5px rgba(0,0,0,0.4)',
+                  color:'#C084FC',
+                } : { color:'var(--t-text-dim)' }}
+              >
+                {m === 'grid' ? <LayoutGrid className="w-4 h-4" /> : <List className="w-4 h-4" />}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Directory View */}
-        {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredEmployees.map((emp) => (
+        {/* Grid / List */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="glass-card h-48 animate-pulse" style={{ background:'rgba(139,92,246,0.04)' }} />
+            ))}
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((emp) => (
               <a
                 key={emp.id}
                 href={`/employees/${emp.id}`}
-                className="group flex flex-col items-center rounded-xl border border-line bg-panel p-6 shadow-card transition hover:border-accent hover:shadow-lg"
+                className="glass-card group flex flex-col items-center p-6 text-center"
               >
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent2 text-2xl font-semibold text-white mb-4 group-hover:scale-105 transition-transform">
-                  {emp.first_name?.[0]}
-                  {emp.last_name?.[0]}
+                <div
+                  className="flex h-20 w-20 items-center justify-center rounded-2xl text-2xl font-bold text-white mb-4 transition-transform group-hover:scale-105"
+                  style={{
+                    background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
+                    boxShadow:'4px 4px 12px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 16px rgba(139,92,246,0.3)',
+                  }}
+                >
+                  {emp.first_name?.[0]}{emp.last_name?.[0]}
                 </div>
-                <h3 className="font-medium text-lg text-white text-center">
-                  {emp.first_name} {emp.last_name}
-                </h3>
-                <p className="text-sm text-accent mt-1">{emp.designation || 'Employee'}</p>
-                <p className="text-xs text-gray-500 mt-1">{emp.department || 'No Department'}</p>
-                <div className="w-full h-px bg-line my-4"></div>
-                <p className="text-xs text-gray-400 font-mono">{emp.login_id}</p>
+                <h3 className="font-display font-semibold text-white">{emp.first_name} {emp.last_name}</h3>
+                <p className="text-xs mt-1" style={{ color:'#C084FC' }}>{emp.designation || 'Employee'}</p>
+                <p className="text-xs mt-0.5" style={{ color:'var(--t-text-dim)' }}>{emp.department || '—'}</p>
+                <hr className="glow-divider w-full my-4" />
+                <p className="font-mono text-xs" style={{ color:'var(--t-text-dim)' }}>{emp.login_id}</p>
               </a>
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-line bg-panel overflow-hidden">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-panel2 text-xs uppercase tracking-wide text-gray-500">
-                <tr>
-                  <th className="px-6 py-4">Employee</th>
-                  <th className="px-6 py-4">ID</th>
-                  <th className="px-6 py-4">Department</th>
-                  <th className="px-6 py-4">Role</th>
-                  <th className="px-6 py-4 text-right">Action</th>
+          <div className="glass-table-wrap">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="glass-table-head">
+                  {['Employee','ID','Department','Role',''].map(h => (
+                    <th key={h} className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
-                {filteredEmployees.map(emp => (
-                  <tr key={emp.id} className="hover:bg-panel2/50 transition">
-                    <td className="px-6 py-4">
+              <tbody>
+                {filtered.map(emp => (
+                  <tr key={emp.id} className="glass-table-row">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent2 text-xs font-semibold text-white">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold text-white shrink-0"
+                          style={{ background:'linear-gradient(135deg,#8B5CF6,#C084FC)', boxShadow:'2px 2px 6px rgba(0,0,0,0.4)' }}>
                           {emp.first_name?.[0]}{emp.last_name?.[0]}
                         </div>
                         <div>
-                          <p className="font-medium text-white">{emp.first_name} {emp.last_name}</p>
-                          <p className="text-xs text-gray-500">{emp.email}</p>
+                          <p className="font-semibold text-white">{emp.first_name} {emp.last_name}</p>
+                          <p className="text-xs" style={{ color:'var(--t-text-dim)' }}>{emp.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-400 font-mono">{emp.login_id}</td>
-                    <td className="px-6 py-4 text-gray-300">{emp.department || '—'}</td>
-                    <td className="px-6 py-4 text-gray-300 capitalize">{emp.role}</td>
-                    <td className="px-6 py-4 text-right">
-                      <a href={`/employees/${emp.id}`} className="text-accent hover:text-accent2 text-xs font-medium">View Profile</a>
+                    <td className="px-5 py-4 font-mono text-xs" style={{ color:'rgba(192,132,252,0.7)' }}>{emp.login_id}</td>
+                    <td className="px-5 py-4 text-sm" style={{ color:'var(--t-text-muted)' }}>{emp.department || '—'}</td>
+                    <td className="px-5 py-4 text-sm capitalize" style={{ color:'var(--t-text-muted)' }}>{emp.role}</td>
+                    <td className="px-5 py-4 text-right">
+                      <a href={`/employees/${emp.id}`} className="text-xs font-medium transition-opacity hover:opacity-70" style={{ color:'#C084FC' }}>
+                        View →
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -252,27 +289,12 @@ export default function EmployeesPage() {
           </div>
         )}
 
-        {filteredEmployees.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No employees match your search criteria.</p>
+        {!loading && filtered.length === 0 && (
+          <div className="py-16 text-center" style={{ color:'var(--t-text-dim)' }}>
+            No employees match your filters.
           </div>
         )}
       </div>
     </AppLayout>
-  );
-}
-
-function Field({ label, value, onChange, type = 'text', required = false }) {
-  return (
-    <div>
-      <label className="text-xs uppercase tracking-wide text-gray-500 block mb-1">{label}</label>
-      <input
-        type={type}
-        className="w-full rounded-lg border border-line bg-panel2 px-3 py-2 text-sm text-white outline-none focus:border-accent transition"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
-      />
-    </div>
   );
 }

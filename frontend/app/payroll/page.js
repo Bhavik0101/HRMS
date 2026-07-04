@@ -49,6 +49,7 @@ function SalaryField({ label, value, onChange, readonly, type = 'text', suffix, 
 
 function ComponentRow({ label, description, amountValue, pctValue, prefix='₹', onChangeAmount, readonly }) {
   return (
+<<<<<<< HEAD
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-b border-white/5 last:border-0">
       <div className="flex-1">
         <p className="text-sm font-medium text-white mb-0.5">{label}</p>
@@ -84,6 +85,12 @@ function ComponentRow({ label, description, amountValue, pctValue, prefix='₹',
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color:'rgba(192,132,252,0.8)' }}>%</span>
         </div>
       </div>
+=======
+    <div className="glass-card p-4 relative overflow-hidden">
+      <div style={{ position:'absolute', top:-15, right:-15, width:60, height:60, borderRadius:'50%', background:'radial-gradient(circle, var(--t-accent-glow), transparent)', filter:'blur(6px)' }} />
+      <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color:'var(--t-text-label)' }}>{label}</p>
+      <p className="text-lg font-bold font-display" style={{ color:'var(--t-accent-s)' }}>{value || '—'}</p>
+>>>>>>> 03cd781621b0c02878b8bd684424d5f5082b1348
     </div>
   );
 }
@@ -299,24 +306,50 @@ export default function PayrollPage() {
     <AppLayout>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-6">
         <div>
-          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>Compensation</p>
+          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'var(--t-text-label)' }}>Compensation</p>
           <h1 className="font-display text-3xl font-bold text-white">Payroll & Salary</h1>
         </div>
 
         {msg && (
           <div className="rounded-xl px-4 py-2.5 text-sm" style={{
-            background: msg.startsWith('✓') ? 'rgba(34,197,94,0.1)' : 'rgba(139,92,246,0.1)',
-            border: msg.startsWith('✓') ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(139,92,246,0.2)',
-            color: msg.startsWith('✓') ? '#22C55E' : '#C084FC',
+            background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'var(--t-accent-glow-sm)',
+            border: msg.startsWith('✓') ? '1px solid rgba(16,185,129,0.25)' : '1px solid var(--t-border)',
+            color: msg.startsWith('✓') ? '#10B981' : 'var(--t-accent-s)',
           }}>
             {msg}
           </div>
         )}
 
         {isAdmin ? (
+<<<<<<< HEAD
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-1 glass-card overflow-hidden flex flex-col h-[600px] lg:h-[800px]">
               <div className="px-5 py-4" style={{ borderBottom:'1px solid rgba(139,92,246,0.1)', background:'rgba(139,92,246,0.04)' }}>
+=======
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
+
+            {/* Mobile Employee Select Dropdown */}
+            <div className="lg:hidden w-full">
+              <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Select Employee</label>
+              <select
+                value={selectedEmp?.id || ''}
+                onChange={(e) => {
+                  const emp = employees.find(x => x.id === parseInt(e.target.value));
+                  if (emp) viewSalary(emp);
+                }}
+                className="glass-input w-full px-4 py-2.5 text-sm"
+              >
+                <option value="" disabled>-- Choose an Employee --</option>
+                {employees.map(emp => (
+                  <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Employee list */}
+            <div className="glass-card overflow-hidden lg:flex flex-col hidden" style={{ height:600 }}>
+              <div className="px-5 py-4" style={{ borderBottom:'1px solid var(--t-border)', background:'var(--t-surface2)' }}>
+>>>>>>> 03cd781621b0c02878b8bd684424d5f5082b1348
                 <h2 className="font-display font-semibold text-white">Employees</h2>
               </div>
               <div className="flex-1 overflow-y-auto p-2">
@@ -326,6 +359,7 @@ export default function PayrollPage() {
                     onClick={() => viewSalary(emp)}
                     className="w-full flex items-center gap-3 rounded-xl px-3 py-3 mb-1 text-left transition-all"
                     style={selectedEmp?.id === emp.id ? {
+<<<<<<< HEAD
                       background:'rgba(139,92,246,0.15)', boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.35)', borderLeft:'3px solid #8B5CF6',
                     } : { background:'transparent', borderLeft:'3px solid transparent' }}
                   >
@@ -336,6 +370,22 @@ export default function PayrollPage() {
                       ) : (
                         <>{emp.first_name?.[0]}{emp.last_name?.[0]}</>
                       )}
+=======
+                      background:'var(--t-accent-glow-sm)',
+                      boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.35)',
+                      borderLeft:'3px solid var(--t-accent-p)',
+                    } : {
+                      background:'transparent',
+                      borderLeft:'3px solid transparent',
+                    }}
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white"
+                      style={{
+                        background:'var(--t-accent-grad)',
+                        boxShadow:'2px 2px 6px rgba(0,0,0,0.4)',
+                      }}>
+                      {emp.first_name?.[0]}{emp.last_name?.[0]}
+>>>>>>> 03cd781621b0c02878b8bd684424d5f5082b1348
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-white truncate">{emp.first_name} {emp.last_name}</p>

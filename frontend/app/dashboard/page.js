@@ -59,10 +59,10 @@ export default function DashboardPage() {
   const now     = new Date();
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
 
-  const statusColors = { present:'#22C55E', on_leave:'#F59E0B', absent:'#EF4444' };
+  const statusColors = { present:'#10B981', on_leave:'#F59E0B', absent:'#EF4444' };
   const statCards = isAdmin ? [
-    { label: 'Total Employees', value: employees.length, icon: Users, color: '#8B5CF6' },
-    { label: 'Present Today', value: employees.filter(e => e.status === 'present').length, icon: UserCheck, color: '#22C55E' },
+    { label: 'Total Employees', value: employees.length, icon: Users, color: 'var(--t-accent-p)' },
+    { label: 'Present Today', value: employees.filter(e => e.status === 'present').length, icon: UserCheck, color: '#10B981' },
     { label: 'On Leave', value: employees.filter(e => e.status === 'on_leave').length, icon: CalendarDays, color: '#F59E0B' },
   ] : [];
 
@@ -73,7 +73,7 @@ export default function DashboardPage() {
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>
+            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'var(--t-text-label)' }}>
               {greeting}
             </p>
             <h1 className="font-display text-3xl font-bold text-white">
@@ -136,39 +136,39 @@ export default function DashboardPage() {
         {isAdmin && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {statCards.map((s) => {
-              const Icon = s.icon;
-              return (
-                <div key={s.label} className="glass-card shine-card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      className="flex h-11 w-11 items-center justify-center rounded-xl"
-                      style={{
-                        background:`rgba(${s.color === '#8B5CF6' ? '139,92,246' : s.color === '#22C55E' ? '34,197,94' : '245,158,11'},0.15)`,
-                        boxShadow:`4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.03), 0 0 10px ${s.color}30`,
-                      }}
-                    >
-                      <Icon className="w-5 h-5" style={{ color: s.color }} />
-                    </span>
-                    <span className="text-3xl font-bold font-display" style={{ color: s.color }}>
-                      {loading ? '–' : s.value}
-                    </span>
-                  </div>
-                  <p className="text-sm font-medium" style={{ color:'var(--t-text-muted)' }}>{s.label}</p>
-                </div>
-              );
+               const Icon = s.icon;
+               return (
+                 <div key={s.label} className="glass-card shine-card p-6">
+                   <div className="flex items-center justify-between mb-4">
+                     <span
+                       className="flex h-11 w-11 items-center justify-center rounded-xl"
+                       style={{
+                         background: s.color === 'var(--t-accent-p)' ? 'var(--t-accent-glow-sm)' : s.color === '#10B981' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+                         boxShadow: `4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.03), 0 0 10px ${s.color === 'var(--t-accent-p)' ? 'rgba(79,70,229,0.3)' : s.color === '#10B981' ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`,
+                       }}
+                     >
+                       <Icon className="w-5 h-5" style={{ color: s.color }} />
+                     </span>
+                     <span className="text-3xl font-bold font-display" style={{ color: s.color }}>
+                       {loading ? '–' : s.value}
+                     </span>
+                   </div>
+                   <p className="text-sm font-medium" style={{ color:'var(--t-text-muted)' }}>{s.label}</p>
+                 </div>
+               );
             })}
           </div>
         )}
 
         {/* ── Quick links ── */}
         <div>
-          <h2 className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color:'rgba(192,132,252,0.5)' }}>
+          <h2 className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color:'var(--t-text-label)' }}>
             Quick Access
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <QuickLink href="/profile"    title="My Profile"  desc="View & edit your details"  glow="#8B5CF6" />
-            <QuickLink href="/attendance" title="Attendance"  desc="Daily & weekly records"     glow="#22C55E" />
-            <QuickLink href="/timeoff"    title="Time Off"    desc="Apply & track leave"        glow="#C084FC" />
+            <QuickLink href="/profile"    title="My Profile"  desc="View & edit your details"  glow="var(--t-accent-p)" />
+            <QuickLink href="/attendance" title="Attendance"  desc="Daily & weekly records"     glow="#10B981" />
+            <QuickLink href="/timeoff"    title="Time Off"    desc="Apply & track leave"        glow="var(--t-accent-s)" />
           </div>
         </div>
 
@@ -176,17 +176,17 @@ export default function DashboardPage() {
         {isAdmin && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.5)' }}>
+              <h2 className="text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
                 Team Members
               </h2>
-              <a href="/employees" className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-70" style={{ color:'#C084FC' }}>
+              <a href="/employees" className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-70" style={{ color:'var(--t-accent-s)' }}>
                 View all <ArrowRight className="w-3.5 h-3.5" />
               </a>
             </div>
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1,2,3].map(i => (
-                  <div key={i} className="glass-card h-24 animate-pulse" style={{ background:'rgba(139,92,246,0.05)' }} />
+                  <div key={i} className="glass-card h-24 animate-pulse" style={{ background:'var(--t-accent-glow-sm)' }} />
                 ))}
               </div>
             ) : (
@@ -203,25 +203,25 @@ export default function DashboardPage() {
                         <div
                           className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold text-white"
                           style={{
-                            background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
-                            boxShadow:'3px 3px 8px rgba(0,0,0,0.5), 0 0 10px rgba(139,92,246,0.3)',
+                            background:'var(--t-accent-grad)',
+                            boxShadow:'3px 3px 8px rgba(0,0,0,0.5), 0 0 10px var(--t-accent-glow)',
                           }}
                         >
                           {emp.first_name?.[0]}{emp.last_name?.[0]}
                         </div>
                         <span
                           className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2"
-                          style={{ background:dotColor, borderColor:'#0d0d14', boxShadow:`0 0 6px ${dotColor}` }}
+                          style={{ background:dotColor, borderColor:'var(--t-surface)', boxShadow:`0 0 6px ${dotColor}` }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-white truncate">{emp.first_name} {emp.last_name}</p>
-                        <p className="text-xs truncate mt-0.5" style={{ color:'rgba(192,132,252,0.7)' }}>
+                        <p className="text-xs truncate mt-0.5" style={{ color:'var(--t-text-label)' }}>
                           {emp.designation || emp.role}
                         </p>
                         <p className="text-xs truncate" style={{ color:'var(--t-text-dim)' }}>{emp.department}</p>
                       </div>
-                      <ChevronRight className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color:'#8B5CF6' }} />
+                      <ChevronRight className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color:'var(--t-accent-p)' }} />
                     </a>
                   );
                 })}
@@ -245,7 +245,7 @@ function QuickLink({ href, title, desc, glow }) {
         style={{
           position:'absolute', top:-20, right:-20,
           width:80, height:80, borderRadius:'50%',
-          background:`radial-gradient(circle, ${glow}25 0%, transparent 70%)`,
+          background:`radial-gradient(circle, ${glow === 'var(--t-accent-p)' || glow === 'var(--t-accent-s)' ? glow : '#10B981'}25 0%, transparent 70%)`,
           filter:'blur(8px)',
           pointerEvents:'none',
           transition:'opacity 0.3s',
@@ -255,7 +255,7 @@ function QuickLink({ href, title, desc, glow }) {
         <p className="font-display font-semibold text-base text-white">{title}</p>
         <p className="mt-1 text-sm" style={{ color:'var(--t-text-muted)' }}>{desc}</p>
       </div>
-      <div className="flex items-center gap-1 mt-4 text-xs font-medium" style={{ color: glow }}>
+      <div className="flex items-center gap-1 mt-4 text-xs font-medium" style={{ color: glow === 'var(--t-accent-p)' || glow === 'var(--t-accent-s)' ? 'var(--t-accent-p)' : '#10B981' }}>
         Open <ArrowRight className="w-3.5 h-3.5" />
       </div>
     </a>

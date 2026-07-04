@@ -9,7 +9,7 @@ import { LayoutGrid, List, Search, Plus, X } from 'lucide-react';
 function GlassInput({ label, type = 'text', value, onChange, required = false }) {
   return (
     <div>
-      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>
+      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
         {label}
       </label>
       <input
@@ -26,7 +26,7 @@ function GlassInput({ label, type = 'text', value, onChange, required = false })
 function GlassSelect({ label, value, onChange, children }) {
   return (
     <div>
-      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>
+      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
         {label}
       </label>
       <select
@@ -106,7 +106,7 @@ export default function EmployeesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>People</p>
+            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'var(--t-text-label)' }}>People</p>
             <h1 className="font-display text-3xl font-bold text-white">Employee Directory</h1>
           </div>
           {isAdmin && (
@@ -160,13 +160,13 @@ export default function EmployeesPage() {
 
         {/* Created credentials */}
         {created && (
-          <div className="glass-card p-5 animate-in" style={{ border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.07)' }}>
+          <div className="glass-card p-5 animate-in" style={{ border:'1px solid var(--t-border)', background:'var(--t-accent-glow-sm)' }}>
             <p className="font-semibold text-white mb-2">✓ Employee created successfully!</p>
             <p className="text-sm mb-3" style={{ color:'var(--t-text-muted)' }}>
               Share these credentials securely:
             </p>
             <div className="flex items-center gap-4 font-mono text-sm rounded-xl p-4"
-              style={{ background:'var(--t-code-bg)', border:'1px solid var(--t-code-border)', color:'#C084FC' }}>
+              style={{ background:'var(--t-code-bg)', border:'1px solid var(--t-code-border)', color:'var(--t-accent-s)' }}>
               <span>Login ID: <strong>{created.loginId}</strong></span>
               <span style={{ color:'rgba(255,255,255,0.2)' }}>·</span>
               <span>Password: <strong>{created.temporaryPassword}</strong></span>
@@ -206,9 +206,9 @@ export default function EmployeesPage() {
                 onClick={() => setViewMode(m)}
                 className="p-2 rounded-lg transition-all"
                 style={viewMode === m ? {
-                  background:'rgba(139,92,246,0.2)',
+                  background:'var(--t-accent-glow-sm)',
                   boxShadow:'inset 2px 2px 5px rgba(0,0,0,0.4)',
-                  color:'#C084FC',
+                  color:'var(--t-accent-s)',
                 } : { color:'var(--t-text-dim)' }}
               >
                 {m === 'grid' ? <LayoutGrid className="w-4 h-4" /> : <List className="w-4 h-4" />}
@@ -221,7 +221,7 @@ export default function EmployeesPage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {[1,2,3,4].map(i => (
-              <div key={i} className="glass-card h-48 animate-pulse" style={{ background:'rgba(139,92,246,0.04)' }} />
+              <div key={i} className="glass-card h-48 animate-pulse" style={{ background:'var(--t-accent-glow-sm)' }} />
             ))}
           </div>
         ) : viewMode === 'grid' ? (
@@ -235,14 +235,14 @@ export default function EmployeesPage() {
                 <div
                   className="flex h-20 w-20 items-center justify-center rounded-2xl text-2xl font-bold text-white mb-4 transition-transform group-hover:scale-105"
                   style={{
-                    background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
-                    boxShadow:'4px 4px 12px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 16px rgba(139,92,246,0.3)',
+                    background:'var(--t-accent-grad)',
+                    boxShadow:'4px 4px 12px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 16px var(--t-accent-glow)',
                   }}
                 >
                   {emp.first_name?.[0]}{emp.last_name?.[0]}
                 </div>
                 <h3 className="font-display font-semibold text-white">{emp.first_name} {emp.last_name}</h3>
-                <p className="text-xs mt-1" style={{ color:'#C084FC' }}>{emp.designation || 'Employee'}</p>
+                <p className="text-xs mt-1" style={{ color:'var(--t-accent-s)' }}>{emp.designation || 'Employee'}</p>
                 <p className="text-xs mt-0.5" style={{ color:'var(--t-text-dim)' }}>{emp.department || '—'}</p>
                 <hr className="glow-divider w-full my-4" />
                 <p className="font-mono text-xs" style={{ color:'var(--t-text-dim)' }}>{emp.login_id}</p>
@@ -255,7 +255,7 @@ export default function EmployeesPage() {
               <thead>
                 <tr className="glass-table-head">
                   {['Employee','ID','Department','Role',''].map(h => (
-                    <th key={h} className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>{h}</th>
+                    <th key={h} className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -265,7 +265,7 @@ export default function EmployeesPage() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold text-white shrink-0"
-                          style={{ background:'linear-gradient(135deg,#8B5CF6,#C084FC)', boxShadow:'2px 2px 6px rgba(0,0,0,0.4)' }}>
+                          style={{ background:'var(--t-accent-grad)', boxShadow:'2px 2px 6px rgba(0,0,0,0.4)' }}>
                           {emp.first_name?.[0]}{emp.last_name?.[0]}
                         </div>
                         <div>
@@ -274,11 +274,11 @@ export default function EmployeesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4 font-mono text-xs" style={{ color:'rgba(192,132,252,0.7)' }}>{emp.login_id}</td>
+                    <td className="px-5 py-4 font-mono text-xs" style={{ color:'var(--t-accent-s)' }}>{emp.login_id}</td>
                     <td className="px-5 py-4 text-sm" style={{ color:'var(--t-text-muted)' }}>{emp.department || '—'}</td>
                     <td className="px-5 py-4 text-sm capitalize" style={{ color:'var(--t-text-muted)' }}>{emp.role}</td>
                     <td className="px-5 py-4 text-right">
-                      <a href={`/employees/${emp.id}`} className="text-xs font-medium transition-opacity hover:opacity-70" style={{ color:'#C084FC' }}>
+                      <a href={`/employees/${emp.id}`} className="text-xs font-medium transition-opacity hover:opacity-70" style={{ color:'var(--t-accent-s)' }}>
                         View →
                       </a>
                     </td>

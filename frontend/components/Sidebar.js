@@ -6,23 +6,27 @@ import { useEffect, useState } from 'react';
 import { getUser, clearSession } from '../lib/api';
 import {
   LayoutDashboard, Users, CalendarCheck,
-  CalendarDays, Wallet, User as UserIcon, LogOut,
+  CalendarDays, Wallet, User as UserIcon, LogOut, X
 } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
-  const router   = useRouter();
+  const router = useRouter();
   const [user, setUserState] = useState(null);
 
   useEffect(() => { setUserState(getUser()); }, []);
 
+  // Auto-close sidebar on page change for mobile
+  useEffect(() => {
+    if (onClose) onClose();
+  }, [pathname]);
+
   const links = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/employees', label: 'Employees',  icon: Users },
+    { href: '/employees', label: 'Employees', icon: Users },
     { href: '/attendance', label: 'Attendance', icon: CalendarCheck },
-    { href: '/timeoff',   label: 'Time Off',   icon: CalendarDays },
-    { href: '/payroll',   label: 'Payroll',    icon: Wallet },
+    { href: '/timeoff', label: 'Time Off', icon: CalendarDays },
+    { href: '/payroll', label: 'Payroll', icon: Wallet },
   ];
 
   function logout() {
@@ -37,42 +41,60 @@ export default function Sidebar() {
   const statusDot = statusColors[user.status] ?? '#6B7280';
 
   return (
-    <aside
-      className="glass-sidebar sticky top-0 h-screen w-64 flex flex-col shrink-0"
-      style={{ zIndex: 50 }}
-    >
-      {/* Logo */}
-      <div className="flex h-16 items-center px-6" style={{ borderBottom: '1px solid rgba(139,92,246,0.12)' }}>
-        <Link href="/dashboard" className="flex items-center gap-2">
-          {/* Neumorphic logo badge */}
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold text-white"
-            style={{
-              background: 'linear-gradient(135deg,#8B5CF6,#C084FC)',
-              boxShadow: '0 4px 12px rgba(139,92,246,0.5), inset 0 1px 0 rgba(255,255,255,0.25)',
-            }}
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={`glass-sidebar fixed top-0 bottom-0 left-0 w-64 flex flex-col shrink-0 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:h-screen ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Logo */}
+        <div className="flex h-16 items-center justify-between px-6" style={{ borderBottom: '1px solid var(--t-border)' }}>
+          <Link href="/dashboard" className="flex items-center gap-2">
+            {/* Neumorphic logo badge */}
+            <span
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold text-white"
+              style={{
+                background: 'var(--t-accent-grad)',
+                boxShadow: '0 4px 12px var(--t-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25)',
+              }}
+            >
+              HR
+            </span>
+            <span className="font-display text-lg font-bold tracking-tight text-white">
+              <span style={{ color: 'var(--t-accent-s)' }}>Odoo</span>
+              <span style={{ color: 'var(--t-text-muted)' }}> HRMS</span>
+            </span>
+          </Link>
+
+          {/* Close button on mobile */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white transition-colors"
+            aria-label="Close menu"
           >
-            HR
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight text-white">
-            <span style={{ color: '#C084FC' }}>Odoo</span>
-            <span style={{ color: 'rgba(255,255,255,0.75)' }}> HRMS</span>
-          </span>
-        </Link>
-      </div>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
       {/* Nav links */}
       <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
         {links.map((l) => {
           const active = pathname?.startsWith(l.href);
-          const Icon   = l.icon;
+          const Icon = l.icon;
           return (
             <Link
               key={l.href}
               href={l.href}
-              className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                active ? 'nav-active' : 'text-gray-400 hover:text-white'
-              }`}
+              className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${active ? 'nav-active' : 'text-gray-400 hover:text-white'
+                }`}
               style={!active ? {
                 borderLeft: '3px solid transparent',
               } : undefined}
@@ -80,8 +102,8 @@ export default function Sidebar() {
               <span
                 className="flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 shrink-0"
                 style={active ? {
-                  background: 'rgba(139,92,246,0.2)',
-                  boxShadow: '0 0 10px rgba(139,92,246,0.3), inset 2px 2px 5px rgba(0,0,0,0.3)',
+                  background: 'var(--t-accent-glow-sm)',
+                  boxShadow: '0 0 10px var(--t-accent-glow), inset 2px 2px 5px rgba(0,0,0,0.3)',
                 } : {
                   background: 'rgba(255,255,255,0.03)',
                   boxShadow: '2px 2px 6px rgba(0,0,0,0.4), -1px -1px 4px rgba(255,255,255,0.03)',
@@ -89,7 +111,7 @@ export default function Sidebar() {
               >
                 <Icon
                   className="w-4 h-4"
-                  style={{ color: active ? '#C084FC' : 'inherit' }}
+                  style={{ color: active ? 'var(--t-accent-s)' : 'inherit' }}
                 />
               </span>
               <span className="truncate">{l.label}</span>
@@ -97,7 +119,7 @@ export default function Sidebar() {
               {active && (
                 <span
                   className="ml-auto h-1.5 w-1.5 rounded-full"
-                  style={{ background: '#C084FC', boxShadow: '0 0 6px #C084FC' }}
+                  style={{ background: 'var(--t-accent-s)', boxShadow: '0 0 6px var(--t-accent-s)' }}
                 />
               )}
             </Link>
@@ -106,21 +128,21 @@ export default function Sidebar() {
       </nav>
 
       {/* User card */}
-      <div className="p-3" style={{ borderTop: '1px solid rgba(139,92,246,0.1)' }}>
+      <div className="p-3" style={{ borderTop: '1px solid var(--t-border)' }}>
         <div
           className="flex items-center gap-3 rounded-2xl p-3"
           style={{
-            background: 'rgba(21,21,31,0.7)',
+            background: 'var(--t-surface)',
             boxShadow: 'inset 3px 3px 8px rgba(0,0,0,0.5), inset -1px -1px 4px rgba(255,255,255,0.03)',
-            border: '1px solid rgba(139,92,246,0.1)',
+            border: '1px solid var(--t-border)',
           }}
         >
           <div className="relative shrink-0">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-white overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg,#8B5CF6,#C084FC)',
-                boxShadow: '3px 3px 8px rgba(0,0,0,0.5), -1px -1px 5px rgba(255,255,255,0.04), 0 0 10px rgba(139,92,246,0.3)',
+                background: 'var(--t-accent-grad)',
+                boxShadow: '3px 3px 8px rgba(0,0,0,0.5), -1px -1px 5px rgba(255,255,255,0.04), 0 0 10px var(--t-accent-glow)',
               }}
             >
               {user.profile_picture_url ? (
@@ -133,7 +155,7 @@ export default function Sidebar() {
               className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2"
               style={{
                 background: statusDot,
-                borderColor: '#11111a',
+                borderColor: 'var(--t-surface)',
                 boxShadow: `0 0 6px ${statusDot}`,
               }}
             />
@@ -142,16 +164,10 @@ export default function Sidebar() {
             <p className="truncate text-sm font-semibold text-white">
               {user.first_name} {user.last_name}
             </p>
-            <p className="truncate text-xs capitalize" style={{ color: '#C084FC', opacity: 0.8 }}>
+            <p className="truncate text-xs capitalize" style={{ color: 'var(--t-accent-s)', opacity: 0.8 }}>
               {user.role}
             </p>
           </div>
-        </div>
-
-        {/* Theme toggle */}
-        <div className="flex items-center justify-between mt-3 mb-1 px-1">
-          <span className="text-xs font-medium" style={{ color:'var(--t-text-muted)' }}>Appearance</span>
-          <ThemeToggle />
         </div>
 
         <div className="mt-2 flex gap-2">
@@ -184,5 +200,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+  </>
   );
 }

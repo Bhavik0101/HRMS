@@ -31,7 +31,7 @@ export default function ThemeToggle({ compact = false }) {
         style={{
           opacity: isDark ? 1 : 0.35,
           transform: isDark ? 'scale(1)' : 'scale(0.8)',
-          filter: isDark ? 'drop-shadow(0 0 4px #8B5CF6)' : 'none',
+          filter: isDark ? 'drop-shadow(0 0 4px var(--t-accent-p))' : 'none',
         }}
       >
         🌙

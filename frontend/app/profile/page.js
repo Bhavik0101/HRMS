@@ -14,8 +14,8 @@ const TABS = [
 
 function GlassInput({ label, value, onChange, type = 'text', readonly = false, textarea = false }) {
   const sharedStyle = readonly ? {
-    background: 'rgba(139,92,246,0.04)',
-    border: '1px solid rgba(139,92,246,0.1)',
+    background: 'var(--t-code-bg)',
+    border: '1px solid var(--t-code-border)',
     color: 'var(--t-text-muted)',
     borderRadius: 12,
     padding: '0.625rem 0.875rem',
@@ -23,10 +23,10 @@ function GlassInput({ label, value, onChange, type = 'text', readonly = false, t
     fontSize: '0.875rem',
     outline: 'none',
   } : {
-    background: 'rgba(10,10,18,0.7)',
+    background: 'var(--t-glass-input)',
     backdropFilter: 'blur(8px)',
-    border: '1px solid rgba(255,255,255,0.07)',
-    color: '#e2e2f0',
+    border: '1px solid var(--t-border)',
+    color: 'var(--t-text)',
     borderRadius: 12,
     padding: '0.625rem 0.875rem',
     width: '100%',
@@ -37,7 +37,7 @@ function GlassInput({ label, value, onChange, type = 'text', readonly = false, t
 
   return (
     <div>
-      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>
+      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
         {label}
       </label>
       {textarea ? (
@@ -66,9 +66,9 @@ function GlassInput({ label, value, onChange, type = 'text', readonly = false, t
 function SalaryCard({ label, value }) {
   return (
     <div className="glass-card p-4 relative overflow-hidden">
-      <div style={{ position:'absolute', top:-15, right:-15, width:50, height:50, borderRadius:'50%', background:'radial-gradient(circle, rgba(139,92,246,0.2), transparent)', filter:'blur(6px)' }} />
-      <p className="text-xs font-medium tracking-widest uppercase mb-1.5" style={{ color:'rgba(192,132,252,0.55)' }}>{label}</p>
-      <p className="font-bold font-display text-lg" style={{ color:'#C084FC' }}>{value || '—'}</p>
+      <div style={{ position:'absolute', top:-15, right:-15, width:50, height:50, borderRadius:'50%', background:'radial-gradient(circle, var(--t-accent-glow), transparent)', filter:'blur(6px)' }} />
+      <p className="text-xs font-medium tracking-widest uppercase mb-1.5" style={{ color:'var(--t-text-label)' }}>{label}</p>
+      <p className="font-bold font-display text-lg" style={{ color:'var(--t-accent-s)' }}>{value || '—'}</p>
     </div>
   );
 }
@@ -136,8 +136,8 @@ export default function ProfilePage() {
           <div
             className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold text-white overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg,#8B5CF6,#C084FC)',
-              boxShadow: '6px 6px 16px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 20px rgba(139,92,246,0.35)',
+              background: 'var(--t-accent-grad)',
+              boxShadow: '6px 6px 16px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 20px var(--t-accent-glow)',
             }}
           >
             {user.profile_picture_url ? (
@@ -150,7 +150,7 @@ export default function ProfilePage() {
             <h1 className="font-display text-2xl font-bold text-white">
               {user.first_name} {user.last_name}
             </h1>
-            <p className="text-sm mt-0.5" style={{ color:'rgba(192,132,252,0.7)' }}>
+            <p className="text-sm mt-0.5" style={{ color:'var(--t-text-label)' }}>
               {user.designation || user.role}
               {user.department && <span style={{ color:'var(--t-text-dim)' }}> · {user.department}</span>}
             </p>
@@ -159,17 +159,17 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-2xl" style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
+        <div className="flex overflow-x-auto gap-1 p-1 rounded-2xl shrink-0" style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
           {availableTabs.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => { setTab(key); setMsg(''); }}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all"
               style={tab === key ? {
-                background:'rgba(139,92,246,0.2)',
-                boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.4), 0 0 10px rgba(139,92,246,0.15)',
-                color:'#C084FC',
-                border:'1px solid rgba(139,92,246,0.2)',
+                background:'var(--t-accent-glow-sm)',
+                boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.4), 0 0 10px var(--t-accent-glow-sm)',
+                color:'var(--t-accent-s)',
+                border:'1px solid var(--t-border)',
               } : {
                 color:'var(--t-text-dim)',
                 border:'1px solid transparent',
@@ -183,9 +183,9 @@ export default function ProfilePage() {
 
         {msg && (
           <div className="rounded-xl px-4 py-2.5 text-sm" style={{
-            background: msg.startsWith('✓') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-            border: msg.startsWith('✓') ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(239,68,68,0.25)',
-            color: msg.startsWith('✓') ? '#22C55E' : '#FCA5A5',
+            background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+            border: msg.startsWith('✓') ? '1px solid rgba(16,185,129,0.25)' : '1px solid rgba(239,68,68,0.25)',
+            color: msg.startsWith('✓') ? '#10B981' : '#FCA5A5',
           }}>
             {msg}
           </div>

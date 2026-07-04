@@ -4,30 +4,30 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink:     '#0d0d14',
-        panel:   '#15151f',
-        panel2:  '#1a1a26',
-        surface: '#11111a',
-        line:    'rgba(139,92,246,0.14)',
-        accent:  '#8B5CF6',
-        accent2: '#C084FC',
-        present: '#22C55E',
-        onleave: '#F59E0B',
-        absent:  '#EF4444',
+        ink:     'var(--t-bg)',
+        panel:   'var(--t-surface)',
+        panel2:  'var(--t-surface2)',
+        surface: 'var(--t-bg2)',
+        line:    'var(--t-border)',
+        accent:  'var(--t-accent-p)',
+        accent2: 'var(--t-accent-s)',
+        present: '#10B981', // Professional Green
+        onleave: '#F59E0B', // Amber
+        absent:  '#EF4444', // Red
       },
       fontFamily: {
         display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         sans:    ['Inter',  'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card:   '0 8px 32px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.05) inset',
-        neum:   '6px 6px 16px rgba(0,0,0,0.55), -4px -4px 12px rgba(255,255,255,0.03)',
-        glow:   '0 0 20px rgba(139,92,246,0.35)',
-        'glow-sm': '0 0 10px rgba(139,92,246,0.25)',
+        card:   '0 8px 32px var(--t-card-shadow), 0 1px 0 rgba(255,255,255,0.05) inset',
+        neum:   '6px 6px 16px var(--t-neum-drk), -4px -4px 12px var(--t-neum-lit)',
+        glow:   '0 0 20px var(--t-accent-glow)',
+        'glow-sm': '0 0 10px var(--t-accent-glow-sm)',
       },
       backgroundImage: {
-        'grad-accent':  'linear-gradient(135deg, #8B5CF6 0%, #C084FC 100%)',
-        'grad-surface': 'linear-gradient(135deg, #15151f 0%, #1a1a26 100%)',
+        'grad-accent':  'var(--t-accent-grad)',
+        'grad-surface': 'linear-gradient(135deg, var(--t-surface) 0%, var(--t-surface2) 100%)',
       },
       borderRadius: {
         '2xl': '20px',

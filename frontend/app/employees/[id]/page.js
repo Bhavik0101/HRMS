@@ -123,8 +123,8 @@ export default function EmployeeDetailPage() {
             <div
               className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl text-3xl font-bold text-white overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg,#8B5CF6,#C084FC)',
-                boxShadow: '6px 6px 16px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 24px rgba(139,92,246,0.35)',
+                background: 'var(--t-accent-grad)',
+                boxShadow: '6px 6px 16px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 24px var(--t-accent-glow)',
               }}
             >
               {employee.profile_picture_url
@@ -135,7 +135,7 @@ export default function EmployeeDetailPage() {
               <h1 className="font-display text-3xl font-bold text-white">
                 {employee.first_name} {employee.last_name}
               </h1>
-              <p className="mt-1" style={{ color: 'rgba(192,132,252,0.7)' }}>
+              <p className="mt-1" style={{ color: 'var(--t-text-label)' }}>
                 {employee.designation || employee.role}
                 {employee.department && <span style={{ color:'var(--t-text-dim)' }}> · {employee.department}</span>}
               </p>
@@ -163,24 +163,24 @@ export default function EmployeeDetailPage() {
 
         {msg && (
           <div className="rounded-xl px-4 py-2.5 text-sm" style={{
-            background: msg.startsWith('✓') ? 'rgba(34,197,94,0.1)' : 'rgba(139,92,246,0.1)',
-            border: msg.startsWith('✓') ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(139,92,246,0.2)',
-            color: msg.startsWith('✓') ? '#22C55E' : '#C084FC',
+            background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'var(--t-accent-glow-sm)',
+            border: msg.startsWith('✓') ? '1px solid rgba(16,185,129,0.25)' : '1px solid var(--t-border)',
+            color: msg.startsWith('✓') ? '#10B981' : 'var(--t-accent-s)',
           }}>{msg}</div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-2xl" style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
+        <div className="flex overflow-x-auto gap-1 p-1 rounded-2xl shrink-0" style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
           {visibleTabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all"
               style={activeTab === tab ? {
-                background:'rgba(139,92,246,0.2)',
+                background:'var(--t-accent-glow-sm)',
                 boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.4)',
-                color:'#C084FC',
-                border:'1px solid rgba(139,92,246,0.2)',
+                color:'var(--t-accent-s)',
+                border:'1px solid var(--t-border)',
               } : { color:'var(--t-text-dim)', border:'1px solid transparent' }}
             >
               {tab}
@@ -261,9 +261,9 @@ export default function EmployeeDetailPage() {
                       onClick={() => fileInputRef.current?.click()}
                       className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium transition-all"
                       style={{
-                        background: 'rgba(139,92,246,0.1)',
-                        border: '1px solid rgba(139,92,246,0.25)',
-                        color: '#C084FC',
+                        background: 'var(--t-accent-glow-sm)',
+                        border: '1px solid var(--t-border)',
+                        color: 'var(--t-accent-s)',
                         boxShadow: '3px 3px 8px rgba(0,0,0,0.3)',
                       }}
                     >
@@ -284,7 +284,7 @@ export default function EmployeeDetailPage() {
                   {form.about?.includes('[Document]')
                     ? form.about.split('\n').filter(l => l.includes('[Document]')).map((l, i) => (
                         <div key={i} className="flex items-center gap-2 mb-1">
-                          <FileText className="w-3.5 h-3.5" style={{ color:'#C084FC' }} />
+                          <FileText className="w-3.5 h-3.5" style={{ color:'var(--t-accent-s)' }} />
                           <span>{l.replace('[Document]: ', '')}</span>
                         </div>
                       ))

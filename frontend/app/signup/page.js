@@ -9,12 +9,12 @@ import { Building2, User2, Mail, Phone, Lock, Sparkles } from 'lucide-react';
 function GlassField({ label, icon: Icon, type = 'text', value, onChange, required = false, placeholder = '' }) {
   return (
     <div>
-      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.7)' }}>
+      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
         {label}
       </label>
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'rgba(139,92,246,0.6)' }} />
+          <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'var(--t-accent-s)' }} />
         )}
         <input
           type={type}
@@ -67,7 +67,7 @@ export default function SignUpPage() {
       <div className="aurora-orb" style={{ width:500, height:500, bottom:-200, right:-100, background:'radial-gradient(circle, rgba(192,132,252,0.1) 0%, transparent 65%)', animationDelay:'5s' }} />
 
       <div className="relative w-full max-w-md z-10 animate-in">
-        <div style={{ position:'absolute', inset:-2, borderRadius:24, background:'linear-gradient(135deg, rgba(139,92,246,0.35), rgba(192,132,252,0.15), transparent)', filter:'blur(2px)', zIndex:-1 }} />
+        <div style={{ position:'absolute', inset:-2, borderRadius:24, background:'linear-gradient(135deg, var(--t-accent-glow), var(--t-accent-glow-sm), transparent)', filter:'blur(2px)', zIndex:-1 }} />
 
         <div style={{
           background:'var(--t-glass-bg)',
@@ -79,8 +79,8 @@ export default function SignUpPage() {
           padding:'2.5rem',
         }}>
           <div className="flex items-center gap-2 mb-6">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold text-white" style={{ background:'linear-gradient(135deg,#8B5CF6,#C084FC)', boxShadow:'0 4px 14px rgba(139,92,246,0.5)' }}>HR</span>
-            <span className="font-display text-lg font-bold"><span style={{color:'#C084FC'}}>Odoo</span><span className="text-white"> HRMS</span></span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold text-white" style={{ background:'var(--t-accent-grad)', boxShadow:'0 4px 14px var(--t-accent-glow)' }}>HR</span>
+            <span className="font-display text-lg font-bold"><span style={{color:'var(--t-accent-s)'}}>Odoo</span><span className="text-white"> HRMS</span></span>
           </div>
 
           <h1 className="font-display text-2xl font-bold text-white mb-1">Create account</h1>
@@ -114,7 +114,7 @@ export default function SignUpPage() {
 
           <p className="mt-6 text-center text-sm" style={{ color:'var(--t-text-dim)' }}>
             Already have an account?{' '}
-            <Link href="/signin" className="font-medium hover:opacity-80 transition-opacity" style={{ color:'#C084FC' }}>Sign In</Link>
+            <Link href="/signin" className="font-medium hover:opacity-80 transition-opacity" style={{ color:'var(--t-accent-s)' }}>Sign In</Link>
           </p>
         </div>
       </div>

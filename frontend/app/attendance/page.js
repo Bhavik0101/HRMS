@@ -106,7 +106,7 @@ export default function AttendancePage() {
 
         {/* Stats strip (admin only) */}
         {isAdmin && !loading && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { label:'Total Records', value: records.length, icon: Clock, color:'var(--t-accent-p)' },
               { label:'Present', value: records.filter(r => r.status === 'present').length, icon: UserCheck, color:'#10B981' },

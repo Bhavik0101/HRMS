@@ -155,7 +155,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-2xl" style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
+        <div className="flex overflow-x-auto gap-1 p-1 rounded-2xl shrink-0" style={{ background:'var(--t-surface2)', border:'1px solid var(--t-border)' }}>
           {availableTabs.map(({ key, label, icon: Icon }) => (
             <button
               key={key}

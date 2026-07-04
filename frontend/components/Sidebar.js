@@ -6,15 +6,20 @@ import { useEffect, useState } from 'react';
 import { getUser, clearSession } from '../lib/api';
 import {
   LayoutDashboard, Users, CalendarCheck,
-  CalendarDays, Wallet, User as UserIcon, LogOut,
+  CalendarDays, Wallet, User as UserIcon, LogOut, X
 } from 'lucide-react';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUserState] = useState(null);
 
   useEffect(() => { setUserState(getUser()); }, []);
+
+  // Auto-close sidebar on page change for mobile
+  useEffect(() => {
+    if (onClose) onClose();
+  }, [pathname]);
 
   const links = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -36,29 +41,48 @@ export default function Sidebar() {
   const statusDot = statusColors[user.status] ?? '#6B7280';
 
   return (
-    <aside
-      className="glass-sidebar sticky top-0 h-screen w-64 flex flex-col shrink-0"
-      style={{ zIndex: 50 }}
-    >
-      {/* Logo */}
-      <div className="flex h-16 items-center px-6" style={{ borderBottom: '1px solid var(--t-border)' }}>
-        <Link href="/dashboard" className="flex items-center gap-2">
-          {/* Neumorphic logo badge */}
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold text-white"
-            style={{
-              background: 'var(--t-accent-grad)',
-              boxShadow: '0 4px 12px var(--t-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25)',
-            }}
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={`glass-sidebar fixed top-0 bottom-0 left-0 w-64 flex flex-col shrink-0 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:h-screen ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Logo */}
+        <div className="flex h-16 items-center justify-between px-6" style={{ borderBottom: '1px solid var(--t-border)' }}>
+          <Link href="/dashboard" className="flex items-center gap-2">
+            {/* Neumorphic logo badge */}
+            <span
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold text-white"
+              style={{
+                background: 'var(--t-accent-grad)',
+                boxShadow: '0 4px 12px var(--t-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25)',
+              }}
+            >
+              HR
+            </span>
+            <span className="font-display text-lg font-bold tracking-tight text-white">
+              <span style={{ color: 'var(--t-accent-s)' }}>Odoo</span>
+              <span style={{ color: 'var(--t-text-muted)' }}> HRMS</span>
+            </span>
+          </Link>
+
+          {/* Close button on mobile */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white transition-colors"
+            aria-label="Close menu"
           >
-            HR
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight text-white">
-            <span style={{ color: 'var(--t-accent-s)' }}>Odoo</span>
-            <span style={{ color: 'var(--t-text-muted)' }}> HRMS</span>
-          </span>
-        </Link>
-      </div>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
       {/* Nav links */}
       <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
@@ -172,5 +196,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+  </>
   );
 }

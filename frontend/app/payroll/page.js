@@ -123,10 +123,28 @@ export default function PayrollPage() {
         )}
 
         {isAdmin ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
+
+            {/* Mobile Employee Select Dropdown */}
+            <div className="lg:hidden w-full">
+              <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Select Employee</label>
+              <select
+                value={selectedEmp?.id || ''}
+                onChange={(e) => {
+                  const emp = employees.find(x => x.id === parseInt(e.target.value));
+                  if (emp) viewSalary(emp);
+                }}
+                className="glass-input w-full px-4 py-2.5 text-sm"
+              >
+                <option value="" disabled>-- Choose an Employee --</option>
+                {employees.map(emp => (
+                  <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
+                ))}
+              </select>
+            </div>
 
             {/* Employee list */}
-            <div className="glass-card overflow-hidden flex flex-col" style={{ height:600 }}>
+            <div className="glass-card overflow-hidden lg:flex flex-col hidden" style={{ height:600 }}>
               <div className="px-5 py-4" style={{ borderBottom:'1px solid var(--t-border)', background:'var(--t-surface2)' }}>
                 <h2 className="font-display font-semibold text-white">Employees</h2>
               </div>

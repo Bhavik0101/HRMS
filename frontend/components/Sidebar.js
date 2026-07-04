@@ -117,13 +117,17 @@ export default function Sidebar() {
         >
           <div className="relative shrink-0">
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-white overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg,#8B5CF6,#C084FC)',
                 boxShadow: '3px 3px 8px rgba(0,0,0,0.5), -1px -1px 5px rgba(255,255,255,0.04), 0 0 10px rgba(139,92,246,0.3)',
               }}
             >
-              {initials}
+              {user.profile_picture_url ? (
+                <img src={user.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <span
               className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2"

@@ -175,8 +175,13 @@ async function updateSalary(req, res) {
       leaveTravelAllowance,
       foodAllowance,
       providentFundRate,
+      employeePf,
+      employerPf,
       professionalTax,
       numberOfWorkingDays,
+      workingDaysPerWeek,
+      breakTime,
+      fixedAllowance,
     } = req.body;
 
     const updates = {
@@ -189,9 +194,14 @@ async function updateSalary(req, res) {
       performance_bonus: performanceBonus,
       leave_travel_allowance: leaveTravelAllowance,
       food_allowance: foodAllowance,
+      fixed_allowance: fixedAllowance,
       provident_fund_rate: providentFundRate,
+      employee_pf: employeePf,
+      employer_pf: employerPf,
       professional_tax: professionalTax,
       number_of_working_days: numberOfWorkingDays,
+      working_days_per_week: workingDaysPerWeek,
+      break_time: breakTime,
     };
     Object.keys(updates).forEach((k) => updates[k] === undefined && delete updates[k]);
 

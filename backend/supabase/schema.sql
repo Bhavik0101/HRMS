@@ -71,8 +71,13 @@ create table if not exists salary_structures (
   leave_travel_allowance numeric(12,2) default 0,
   food_allowance numeric(12,2) default 0,
   provident_fund_rate numeric(5,2) default 12.00,
+  employee_pf numeric(12,2) default 0,
+  employer_pf numeric(12,2) default 0,
   professional_tax numeric(12,2) default 200,
   number_of_working_days int default 22,
+  working_days_per_week int default 5,
+  break_time numeric(5,2) default 1,
+  fixed_allowance numeric(12,2) default 0,
   updated_at timestamptz default now()
 );
 

@@ -134,13 +134,17 @@ export default function ProfilePage() {
         {/* Avatar header */}
         <div className="glass-card p-6 flex items-center gap-5">
           <div
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold text-white"
+            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold text-white overflow-hidden"
             style={{
               background: 'linear-gradient(135deg,#8B5CF6,#C084FC)',
               boxShadow: '6px 6px 16px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.04), 0 0 20px rgba(139,92,246,0.35)',
             }}
           >
-            {initials}
+            {user.profile_picture_url ? (
+              <img src={user.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              initials
+            )}
           </div>
           <div>
             <h1 className="font-display text-2xl font-bold text-white">

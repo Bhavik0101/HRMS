@@ -6,52 +6,88 @@ import AppLayout from '../../components/AppLayout';
 import { api, getUser } from '../../lib/api';
 import { IndianRupee, Pencil, Check, X } from 'lucide-react';
 
-function SalaryField({ label, value, onChange, readonly, type = 'text' }) {
+function SalaryField({ label, value, onChange, readonly, type = 'text', suffix, prefix='₹', description }) {
   return (
-    <div>
-      <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>
-        {label}
-      </label>
+    <div className="flex flex-col justify-center">
+      <div className="flex justify-between items-end mb-1">
+        <label className="text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.8)' }}>
+          {label}
+        </label>
+      </div>
+      {description && <p className="text-[10px] mb-2 leading-tight" style={{ color:'var(--t-text-dim)' }}>{description}</p>}
       <div className="relative">
-        {!readonly && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm" style={{ color:'rgba(139,92,246,0.6)' }}>₹</span>}
+        {prefix && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium" style={{ color:'rgba(139,92,246,0.8)' }}>{prefix}</span>}
         <input
           type={type}
           readOnly={readonly}
-          className="w-full rounded-xl py-2.5 text-sm transition-all"
+          className="w-full rounded-xl py-2 text-sm transition-all"
           style={readonly ? {
             background: 'rgba(139,92,246,0.05)',
             border: '1px solid rgba(139,92,246,0.1)',
             color: '#e2e2f0',
-            paddingLeft: '1rem',
-            paddingRight: '1rem',
+            paddingLeft: prefix ? '2rem' : '1rem',
+            paddingRight: suffix ? '4rem' : '1rem',
             outline: 'none',
           } : {
             background: 'rgba(10,10,18,0.7)',
             backdropFilter: 'blur(8px)',
             border: '1px solid rgba(139,92,246,0.3)',
             color: '#e2e2f0',
-            paddingLeft: '2rem',
-            paddingRight: '0.875rem',
+            paddingLeft: prefix ? '2rem' : '1rem',
+            paddingRight: suffix ? '4rem' : '1rem',
             outline: 'none',
             boxShadow: 'inset 3px 3px 7px rgba(0,0,0,0.4), 0 0 8px rgba(139,92,246,0.1)',
           }}
           value={value || ''}
           onChange={(e) => !readonly && onChange && onChange(e.target.value)}
         />
+        {suffix && <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium" style={{ color:'rgba(192,132,252,0.6)' }}>{suffix}</span>}
       </div>
     </div>
   );
 }
 
-function ReadOnlyCard({ label, value }) {
+function ComponentRow({ label, description, amountValue, pctValue, prefix='₹', onChangeAmount, readonly }) {
   return (
-    <div className="glass-card p-4 relative overflow-hidden">
-      <div style={{ position:'absolute', top:-15, right:-15, width:60, height:60, borderRadius:'50%', background:'radial-gradient(circle, rgba(139,92,246,0.15), transparent)', filter:'blur(6px)' }} />
-      <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color:'rgba(192,132,252,0.55)' }}>{label}</p>
-      <p className="text-lg font-bold font-display" style={{ color:'#C084FC' }}>{value || '—'}</p>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-b border-white/5 last:border-0">
+      <div className="flex-1">
+        <p className="text-sm font-medium text-white mb-0.5">{label}</p>
+        <p className="text-[10px]" style={{ color:'var(--t-text-dim)' }}>{description}</p>
+      </div>
+      <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="relative w-full sm:w-32">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color:'rgba(139,92,246,0.8)' }}>{prefix}</span>
+          <input
+            type="number"
+            readOnly={readonly}
+            className="w-full rounded-lg py-1.5 text-sm transition-all"
+            style={readonly ? {
+              background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.1)', color: '#e2e2f0', paddingLeft: '1.5rem', paddingRight: '2rem', outline: 'none'
+            } : {
+              background: 'rgba(10,10,18,0.7)', border: '1px solid rgba(139,92,246,0.3)', color: '#e2e2f0', paddingLeft: '1.5rem', paddingRight: '2rem', outline: 'none'
+            }}
+            value={amountValue || ''}
+            onChange={(e) => !readonly && onChangeAmount && onChangeAmount(e.target.value)}
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px]" style={{ color:'rgba(192,132,252,0.6)' }}>/ mo</span>
+        </div>
+        <div className="relative w-20 shrink-0">
+          <input
+            type="text"
+            readOnly
+            className="w-full rounded-lg py-1.5 text-sm transition-all text-right"
+            style={{
+              background: 'rgba(139,92,246,0.02)', border: '1px solid transparent', color: 'rgba(192,132,252,0.8)', paddingRight: '1.5rem', outline: 'none'
+            }}
+            value={pctValue || ''}
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color:'rgba(192,132,252,0.8)' }}>%</span>
+        </div>
+      </div>
     </div>
   );
 }
+
 
 export default function PayrollPage() {
   const router = useRouter();
@@ -68,7 +104,6 @@ export default function PayrollPage() {
     setUserState(u);
     if (['admin','hr'].includes(u.role)) loadEmployees();
     else loadSelfSalary(u.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadEmployees() {
@@ -85,14 +120,57 @@ export default function PayrollPage() {
     setSelectedEmp(emp);
     setIsEditing(false);
     try { const { salary } = await api.getSalary(emp.id); setSalary(salary); }
-    catch { setMsg(emp.message); setSalary({}); }
+    catch (err) { setMsg(err.message); setSalary({}); }
   }
+
+  const handleWageChange = (v) => {
+    const wage = parseFloat(v) || 0;
+    const basic = wage * 0.50;
+    const hra = basic * 0.50; // 50% of basic
+    const std = wage * 0.1667;
+    const bonus = wage * 0.0833;
+    const lta = wage * 0.0833;
+    const fixed = wage - (basic + hra + std + bonus + lta);
+    const pf = basic * 0.12;
+    
+    setSalary(s => ({
+      ...s,
+      monthlyWage: wage,
+      yearlyWage: wage * 12,
+      basicSalary: basic.toFixed(2),
+      houseRentAllowance: hra.toFixed(2),
+      standardAllowance: std.toFixed(2),
+      performanceBonus: bonus.toFixed(2),
+      leaveTravelAllowance: lta.toFixed(2),
+      fixedAllowance: fixed.toFixed(2),
+      employeePf: pf.toFixed(2),
+      employerPf: pf.toFixed(2),
+      professionalTax: 200,
+    }));
+  };
 
   async function handleSave(e) {
     e.preventDefault();
     try {
       setMsg('Updating…');
-      const { salary: updated } = await api.updateSalary(selectedEmp.id, salary);
+      const payload = {
+        monthlyWage: salary.monthlyWage ?? salary.monthly_wage,
+        yearlyWage: salary.yearlyWage ?? salary.yearly_wage,
+        basicSalary: salary.basicSalary ?? salary.basic_salary,
+        houseRentAllowance: salary.houseRentAllowance ?? salary.house_rent_allowance,
+        standardAllowance: salary.standardAllowance ?? salary.standard_allowance,
+        performanceBonus: salary.performanceBonus ?? salary.performance_bonus,
+        leaveTravelAllowance: salary.leaveTravelAllowance ?? salary.leave_travel_allowance,
+        fixedAllowance: salary.fixedAllowance ?? salary.fixed_allowance,
+        employeePf: salary.employeePf ?? salary.employee_pf,
+        employerPf: salary.employerPf ?? salary.employer_pf,
+        professionalTax: salary.professionalTax ?? salary.professional_tax,
+        workingDaysPerWeek: salary.workingDaysPerWeek ?? salary.working_days_per_week,
+        breakTime: salary.breakTime ?? salary.break_time,
+        providentFundRate: 12.00
+      };
+      
+      const { salary: updated } = await api.updateSalary(selectedEmp.id, payload);
       setSalary(updated);
       setIsEditing(false);
       setMsg('✓ Salary updated successfully.');
@@ -102,11 +180,124 @@ export default function PayrollPage() {
   if (!user) return null;
   const isAdmin = ['admin','hr'].includes(user.role);
 
+  const FormContent = () => (
+    <>
+      <div className="mb-6 pb-6 border-b border-white/10">
+        <h3 className="font-display text-lg text-white mb-4">Salary Info</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <SalaryField label="Month Wage" value={salary.monthlyWage ?? salary.monthly_wage} onChange={handleWageChange} readonly={!isEditing} type="number" suffix="/ Month" />
+            <SalaryField label="Yearly wage" value={salary.yearlyWage ?? salary.yearly_wage} onChange={v => setSalary({...salary, yearlyWage:v})} readonly={!isEditing} type="number" suffix="/ Yearly" />
+          </div>
+          <div className="space-y-4">
+            <SalaryField label="No of working days in a week" value={salary.workingDaysPerWeek ?? salary.working_days_per_week} onChange={v => setSalary({...salary, workingDaysPerWeek:v})} readonly={!isEditing} type="number" prefix="" />
+            <SalaryField label="Break Time" value={salary.breakTime ?? salary.break_time} onChange={v => setSalary({...salary, breakTime:v})} readonly={!isEditing} type="number" prefix="" suffix="/ hrs" />
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 pb-6 border-b border-white/10">
+        <h3 className="font-display text-lg text-white mb-4">Salary Components</h3>
+        <div className="space-y-1">
+          <ComponentRow 
+            label="Basic Salary" 
+            description="Define Basic salary from company cost compute it based on monthly Wages"
+            amountValue={salary.basicSalary ?? salary.basic_salary}
+            pctValue="50.00"
+            onChangeAmount={v => setSalary({...salary, basicSalary: v})}
+            readonly={!isEditing}
+          />
+          <ComponentRow 
+            label="House Rent Allowance" 
+            description="HRA provided to employees 50% of the basic salary"
+            amountValue={salary.houseRentAllowance ?? salary.house_rent_allowance}
+            pctValue="50.00"
+            onChangeAmount={v => setSalary({...salary, houseRentAllowance: v})}
+            readonly={!isEditing}
+          />
+          <ComponentRow 
+            label="Standard Allowance" 
+            description="A standard allowance is a predetermined, fixed amount provided to employee as part of their salary"
+            amountValue={salary.standardAllowance ?? salary.standard_allowance}
+            pctValue="16.67"
+            onChangeAmount={v => setSalary({...salary, standardAllowance: v})}
+            readonly={!isEditing}
+          />
+          <ComponentRow 
+            label="Performance Bonus" 
+            description="Variable amount paid during payroll. The value defined by the company and calculated as a % of the basic salary"
+            amountValue={salary.performanceBonus ?? salary.performance_bonus}
+            pctValue="8.33"
+            onChangeAmount={v => setSalary({...salary, performanceBonus: v})}
+            readonly={!isEditing}
+          />
+          <ComponentRow 
+            label="Leave Travel Allowance" 
+            description="LTA is paid by the company to employees to cover their travel expenses and calculated as a % of the basic salary"
+            amountValue={salary.leaveTravelAllowance ?? salary.leave_travel_allowance}
+            pctValue="8.33"
+            onChangeAmount={v => setSalary({...salary, leaveTravelAllowance: v})}
+            readonly={!isEditing}
+          />
+          <ComponentRow 
+            label="Fixed Allowance" 
+            description="fixed allowance portion of wages is determined after calculating all salary components"
+            amountValue={salary.fixedAllowance ?? salary.fixed_allowance}
+            pctValue="11.67"
+            onChangeAmount={v => setSalary({...salary, fixedAllowance: v})}
+            readonly={!isEditing}
+          />
+        </div>
+      </div>
+
+      <div className="mb-6 pb-6 border-b border-white/10">
+        <h3 className="font-display text-lg text-white mb-4">Provident Fund (PF) Contribution</h3>
+        <div className="space-y-1">
+          <ComponentRow 
+            label="Employee" 
+            description="PF is calculated based on the basic salary"
+            amountValue={salary.employeePf ?? salary.employee_pf}
+            pctValue="12.00"
+            onChangeAmount={v => setSalary({...salary, employeePf: v})}
+            readonly={!isEditing}
+          />
+          <ComponentRow 
+            label="Employer" 
+            description="PF is calculated based on the basic salary"
+            amountValue={salary.employerPf ?? salary.employer_pf}
+            pctValue="12.00"
+            onChangeAmount={v => setSalary({...salary, employerPf: v})}
+            readonly={!isEditing}
+          />
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="font-display text-lg text-white mb-4">Tax Deductions</h3>
+        <ComponentRow 
+          label="Professional Tax" 
+          description="Professional Tax deducted from the Gross salary"
+          amountValue={salary.professionalTax ?? salary.professional_tax}
+          pctValue=""
+          onChangeAmount={v => setSalary({...salary, professionalTax: v})}
+          readonly={!isEditing}
+        />
+      </div>
+
+      {isEditing && (
+        <div className="flex justify-end pt-4">
+          <button type="submit" className="btn-glow flex items-center gap-2 px-7 py-2.5 text-sm font-semibold text-white rounded-xl">
+            <Check className="w-4 h-4" />
+            Save Salary Structure
+          </button>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <AppLayout>
-      <div className="mx-auto max-w-6xl px-6 py-8 space-y-6">
-
-        {/* Header */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-6">
         <div>
           <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>Compensation</p>
           <h1 className="font-display text-3xl font-bold text-white">Payroll & Salary</h1>
@@ -123,10 +314,8 @@ export default function PayrollPage() {
         )}
 
         {isAdmin ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            {/* Employee list */}
-            <div className="glass-card overflow-hidden flex flex-col" style={{ height:600 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-1 glass-card overflow-hidden flex flex-col h-[600px] lg:h-[800px]">
               <div className="px-5 py-4" style={{ borderBottom:'1px solid rgba(139,92,246,0.1)', background:'rgba(139,92,246,0.04)' }}>
                 <h2 className="font-display font-semibold text-white">Employees</h2>
               </div>
@@ -137,20 +326,16 @@ export default function PayrollPage() {
                     onClick={() => viewSalary(emp)}
                     className="w-full flex items-center gap-3 rounded-xl px-3 py-3 mb-1 text-left transition-all"
                     style={selectedEmp?.id === emp.id ? {
-                      background:'rgba(139,92,246,0.15)',
-                      boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.35)',
-                      borderLeft:'3px solid #8B5CF6',
-                    } : {
-                      background:'transparent',
-                      borderLeft:'3px solid transparent',
-                    }}
+                      background:'rgba(139,92,246,0.15)', boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.35)', borderLeft:'3px solid #8B5CF6',
+                    } : { background:'transparent', borderLeft:'3px solid transparent' }}
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white"
-                      style={{
-                        background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
-                        boxShadow:'2px 2px 6px rgba(0,0,0,0.4)',
-                      }}>
-                      {emp.first_name?.[0]}{emp.last_name?.[0]}
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white overflow-hidden"
+                      style={{ background:'linear-gradient(135deg,#8B5CF6,#C084FC)', boxShadow:'2px 2px 6px rgba(0,0,0,0.4)' }}>
+                      {emp.profile_picture_url ? (
+                        <img src={emp.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <>{emp.first_name?.[0]}{emp.last_name?.[0]}</>
+                      )}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-white truncate">{emp.first_name} {emp.last_name}</p>
@@ -161,53 +346,34 @@ export default function PayrollPage() {
               </div>
             </div>
 
-            {/* Salary panel */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               {selectedEmp ? (
-                <div className="glass-card p-6">
-                  <div className="flex justify-between items-start mb-6">
+                <div className="glass-card p-6 md:p-8">
+                  <div className="flex justify-between items-start mb-8 pb-6 border-b border-white/10">
                     <div>
-                      <h2 className="font-display text-xl font-bold text-white">
-                        {selectedEmp.first_name} {selectedEmp.last_name}
+                      <h2 className="font-display text-2xl font-bold text-white mb-1">
+                        Salary Structure: {selectedEmp.first_name} {selectedEmp.last_name}
                       </h2>
-                      <p className="text-sm mt-0.5 font-mono" style={{ color:'rgba(192,132,252,0.6)' }}>
-                        {selectedEmp.login_id}
+                      <p className="text-sm font-mono" style={{ color:'rgba(192,132,252,0.6)' }}>
+                        {selectedEmp.designation || 'Employee'} • {selectedEmp.login_id}
                       </p>
                     </div>
                     <button
                       onClick={() => setIsEditing(!isEditing)}
                       className="flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-all"
                       style={isEditing ? {
-                        background:'rgba(239,68,68,0.1)',
-                        border:'1px solid rgba(239,68,68,0.25)',
-                        color:'#FCA5A5',
+                        background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.25)', color:'#FCA5A5',
                       } : {
-                        background:'rgba(255,255,255,0.04)',
-                        border:'1px solid rgba(255,255,255,0.08)',
-                        color:'#e2e2f0',
-                        boxShadow:'3px 3px 8px rgba(0,0,0,0.4)',
+                        background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', color:'#e2e2f0', boxShadow:'3px 3px 8px rgba(0,0,0,0.4)',
                       }}
                     >
-                      {isEditing ? <><X className="w-3.5 h-3.5" />Cancel</> : <><Pencil className="w-3.5 h-3.5" />Edit</>}
+                      {isEditing ? <><X className="w-3.5 h-3.5" />Cancel Edit</> : <><Pencil className="w-3.5 h-3.5" />Edit Structure</>}
                     </button>
                   </div>
 
                   {salary ? (
-                    <form onSubmit={handleSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <SalaryField label="Monthly Wage (₹)"     value={salary.monthly_wage || salary.monthlyWage}         onChange={v => setSalary({...salary, monthlyWage:v})}         readonly={!isEditing} type="number" />
-                      <SalaryField label="Yearly Wage (₹)"      value={salary.yearly_wage || salary.yearlyWage}           onChange={v => setSalary({...salary, yearlyWage:v})}          readonly={!isEditing} type="number" />
-                      <SalaryField label="Basic Salary (₹)"     value={salary.basic_salary || salary.basicSalary}         onChange={v => setSalary({...salary, basicSalary:v})}         readonly={!isEditing} type="number" />
-                      <SalaryField label="HRA (₹)"              value={salary.house_rent_allowance || salary.houseRentAllowance} onChange={v => setSalary({...salary, houseRentAllowance:v})} readonly={!isEditing} type="number" />
-                      <SalaryField label="Performance Bonus (₹)"value={salary.performance_bonus || salary.performanceBonus}     onChange={v => setSalary({...salary, performanceBonus:v})}  readonly={!isEditing} type="number" />
-                      <SalaryField label="LTA (₹)"              value={salary.leave_travel_allowance || salary.leaveTravelAllowance} onChange={v => setSalary({...salary, leaveTravelAllowance:v})} readonly={!isEditing} type="number" />
-                      {isEditing && (
-                        <div className="sm:col-span-2 flex justify-end mt-2">
-                          <button type="submit" className="btn-glow flex items-center gap-2 px-7 py-2.5 text-sm font-semibold text-white rounded-xl">
-                            <Check className="w-4 h-4" />
-                            Save Salary
-                          </button>
-                        </div>
-                      )}
+                    <form onSubmit={handleSave} className="space-y-2">
+                      <FormContent />
                     </form>
                   ) : (
                     <p style={{ color:'var(--t-text-dim)' }}>Loading salary data…</p>
@@ -220,24 +386,18 @@ export default function PayrollPage() {
                     <IndianRupee className="w-8 h-8" style={{ color:'rgba(139,92,246,0.5)' }} />
                   </div>
                   <p className="text-sm" style={{ color:'var(--t-text-muted)' }}>
-                    Select an employee to view their salary structure
+                    Select an employee to view or edit their salary structure
                   </p>
                 </div>
               )}
             </div>
           </div>
         ) : (
-          // Self-view
-          <div className="glass-card p-6 max-w-2xl">
-            <h2 className="font-display text-xl font-bold text-white mb-6">My Salary Structure</h2>
+          <div className="glass-card p-6 md:p-10 max-w-4xl mx-auto">
+            <h2 className="font-display text-2xl font-bold text-white mb-8 pb-6 border-b border-white/10">My Salary Structure</h2>
             {salary ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <ReadOnlyCard label="Monthly Wage"        value={`₹${salary.monthly_wage}`} />
-                <ReadOnlyCard label="Yearly Wage"         value={`₹${salary.yearly_wage}`} />
-                <ReadOnlyCard label="Basic Salary"        value={`₹${salary.basic_salary}`} />
-                <ReadOnlyCard label="HRA"                 value={`₹${salary.house_rent_allowance}`} />
-                <ReadOnlyCard label="Performance Bonus"   value={`₹${salary.performance_bonus}`} />
-                <ReadOnlyCard label="LTA"                 value={`₹${salary.leave_travel_allowance}`} />
+              <div className="space-y-2 pointer-events-none">
+                <FormContent />
               </div>
             ) : (
               <p style={{ color:'var(--t-text-dim)' }}>No salary structure defined yet, or access restricted.</p>

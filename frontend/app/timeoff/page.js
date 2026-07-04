@@ -17,8 +17,8 @@ const typeLabels = {
 };
 
 const typeColors = {
-  paid_time_off: '#8B5CF6',
-  sick_leave:    '#22C55E',
+  paid_time_off: 'var(--t-accent-p)',
+  sick_leave:    '#10B981',
   unpaid_leave:  '#F59E0B',
 };
 
@@ -123,18 +123,26 @@ export default function TimeOffPage() {
             {!isAdmin && allocation && (
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label:'Paid Time Off', left: paidLeft, total: allocation.paid_time_off_total, color:'#8B5CF6', icon: CalendarDays },
-                  { label:'Sick Leave',    left: sickLeft,  total: allocation.sick_leave_total,    color:'#22C55E', icon: Umbrella },
+                  { label:'Paid Time Off', left: paidLeft, total: allocation.paid_time_off_total, color:'var(--t-accent-p)', icon: CalendarDays },
+                  { label:'Sick Leave',    left: sickLeft,  total: allocation.sick_leave_total,    color:'#10B981', icon: Umbrella },
                 ].map(({ label, left, total, color, icon: Icon }) => (
                   <div key={label} className="glass-card p-4 relative overflow-hidden">
-                    <div style={{ position:'absolute', top:-20, right:-20, width:80, height:80, borderRadius:'50%', background:`radial-gradient(circle, ${color}20, transparent)`, filter:'blur(8px)' }} />
+                    <div style={{
+                      position:'absolute', top:-20, right:-20, width:80, height:80, borderRadius:'50%',
+                      background: `radial-gradient(circle, ${color === 'var(--t-accent-p)' ? 'var(--t-accent-glow)' : 'rgba(16,185,129,0.2)'}, transparent)`,
+                      filter:'blur(8px)'
+                    }} />
                     <Icon className="w-5 h-5 mb-3" style={{ color }} />
                     <p className="text-3xl font-bold font-display" style={{ color }}>{left}</p>
                     <p className="text-xs mt-0.5" style={{ color:'var(--t-text-muted)' }}>of {total} days left</p>
                     <p className="text-xs mt-1 font-medium" style={{ color:'var(--t-text-dim)' }}>{label}</p>
                     {/* Progress bar */}
                     <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background:'rgba(255,255,255,0.06)' }}>
-                      <div className="h-full rounded-full" style={{ width:`${Math.max(0,(left/total)*100)}%`, background:color, boxShadow:`0 0 6px ${color}` }} />
+                      <div className="h-full rounded-full" style={{
+                        width:`${Math.max(0,(left/total)*100)}%`,
+                        background:color,
+                        boxShadow: color === 'var(--t-accent-p)' ? '0 0 6px var(--t-accent-glow)' : `0 0 6px ${color}`
+                      }} />
                     </div>
                   </div>
                 ))}
@@ -185,7 +193,7 @@ export default function TimeOffPage() {
                   <p className="px-5 py-8 text-center text-sm" style={{ color:'var(--t-text-dim)' }}>No requests found.</p>
                 ) : requests.map(r => (
                   <div key={r.id} className="px-5 py-4 transition-colors hover:bg-white/[0.02]"
-                    style={{ borderBottom:'1px solid rgba(139,92,246,0.07)' }}>
+                    style={{ borderBottom:'1px solid var(--t-border)' }}>
                     <div className="flex justify-between items-start gap-2">
                       <div className="min-w-0">
                         {r.employees && r.employee_id !== user.id && (
@@ -193,7 +201,7 @@ export default function TimeOffPage() {
                             {r.employees.first_name} {r.employees.last_name}
                           </p>
                         )}
-                        <p className="text-sm font-medium" style={{ color: typeColors[r.time_off_type] || '#C084FC' }}>
+                        <p className="text-sm font-medium" style={{ color: typeColors[r.time_off_type] || 'var(--t-accent-s)' }}>
                           {typeLabels[r.time_off_type]}
                         </p>
                         <p className="text-xs mt-0.5" style={{ color:'var(--t-text-dim)' }}>
@@ -208,7 +216,7 @@ export default function TimeOffPage() {
                       <div className="flex gap-2 mt-3">
                         <button onClick={() => review(r.id, 'approved')}
                           className="flex-1 rounded-xl py-2 text-xs font-semibold transition-all"
-                          style={{ background:'rgba(34,197,94,0.12)', border:'1px solid rgba(34,197,94,0.25)', color:'#22C55E' }}>
+                          style={{ background:'rgba(16,185,129,0.12)', border:'1px solid rgba(16,185,129,0.25)', color:'#10B981' }}>
                           ✓ Approve
                         </button>
                         <button onClick={() => review(r.id, 'rejected')}
@@ -267,12 +275,12 @@ export default function TimeOffPage() {
                       className="relative p-2 overflow-hidden cursor-pointer transition-colors"
                       style={{
                         background: todayDay
-                          ? 'rgba(139,92,246,0.08)'
+                          ? 'var(--t-accent-glow-sm)'
                           : !inMonth
                             ? 'rgba(0,0,0,0.2)'
                             : 'transparent',
-                        borderRight:  (idx+1) % 7 !== 0 ? '1px solid rgba(139,92,246,0.07)' : 'none',
-                        borderBottom: idx < calDays.length - 7 ? '1px solid rgba(139,92,246,0.07)' : 'none',
+                        borderRight:  (idx+1) % 7 !== 0 ? '1px solid var(--t-border)' : 'none',
+                        borderBottom: idx < calDays.length - 7 ? '1px solid var(--t-border)' : 'none',
                         opacity: inMonth ? 1 : 0.4,
                       }}
                       onClick={() => {
@@ -285,7 +293,7 @@ export default function TimeOffPage() {
                       <div
                         className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold mb-1"
                         style={todayDay
-                          ? { background:'linear-gradient(135deg,#8B5CF6,#C084FC)', color:'#fff', boxShadow:'0 0 10px rgba(139,92,246,0.5)' }
+                          ? { background:'var(--t-accent-grad)', color:'#fff', boxShadow:'0 0 10px var(--t-accent-glow)' }
                           : { color:'var(--t-text-dim)' }}
                       >
                         {format(day, 'd')}
@@ -296,8 +304,8 @@ export default function TimeOffPage() {
                             key={leave.id}
                             className="rounded-md px-1.5 py-0.5 text-[9px] font-semibold leading-tight truncate"
                             style={{
-                              background:`${typeColors[leave.time_off_type]}1A`,
-                              border:`1px solid ${typeColors[leave.time_off_type]}30`,
+                              background: leave.time_off_type === 'paid_time_off' ? 'var(--t-accent-glow-sm)' : leave.time_off_type === 'sick_leave' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+                              border: leave.time_off_type === 'paid_time_off' ? '1px solid var(--t-border)' : leave.time_off_type === 'sick_leave' ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(245,158,11,0.3)',
                               color: typeColors[leave.time_off_type],
                             }}
                           >

@@ -46,9 +46,9 @@ function SalaryField({ label, value, onChange, readonly, type = 'text' }) {
 function ReadOnlyCard({ label, value }) {
   return (
     <div className="glass-card p-4 relative overflow-hidden">
-      <div style={{ position:'absolute', top:-15, right:-15, width:60, height:60, borderRadius:'50%', background:'radial-gradient(circle, rgba(139,92,246,0.15), transparent)', filter:'blur(6px)' }} />
-      <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color:'rgba(192,132,252,0.55)' }}>{label}</p>
-      <p className="text-lg font-bold font-display" style={{ color:'#C084FC' }}>{value || '—'}</p>
+      <div style={{ position:'absolute', top:-15, right:-15, width:60, height:60, borderRadius:'50%', background:'radial-gradient(circle, var(--t-accent-glow), transparent)', filter:'blur(6px)' }} />
+      <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color:'var(--t-text-label)' }}>{label}</p>
+      <p className="text-lg font-bold font-display" style={{ color:'var(--t-accent-s)' }}>{value || '—'}</p>
     </div>
   );
 }
@@ -108,15 +108,15 @@ export default function PayrollPage() {
 
         {/* Header */}
         <div>
-          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>Compensation</p>
+          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'var(--t-text-label)' }}>Compensation</p>
           <h1 className="font-display text-3xl font-bold text-white">Payroll & Salary</h1>
         </div>
 
         {msg && (
           <div className="rounded-xl px-4 py-2.5 text-sm" style={{
-            background: msg.startsWith('✓') ? 'rgba(34,197,94,0.1)' : 'rgba(139,92,246,0.1)',
-            border: msg.startsWith('✓') ? '1px solid rgba(34,197,94,0.25)' : '1px solid rgba(139,92,246,0.2)',
-            color: msg.startsWith('✓') ? '#22C55E' : '#C084FC',
+            background: msg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'var(--t-accent-glow-sm)',
+            border: msg.startsWith('✓') ? '1px solid rgba(16,185,129,0.25)' : '1px solid var(--t-border)',
+            color: msg.startsWith('✓') ? '#10B981' : 'var(--t-accent-s)',
           }}>
             {msg}
           </div>
@@ -127,7 +127,7 @@ export default function PayrollPage() {
 
             {/* Employee list */}
             <div className="glass-card overflow-hidden flex flex-col" style={{ height:600 }}>
-              <div className="px-5 py-4" style={{ borderBottom:'1px solid rgba(139,92,246,0.1)', background:'rgba(139,92,246,0.04)' }}>
+              <div className="px-5 py-4" style={{ borderBottom:'1px solid var(--t-border)', background:'var(--t-surface2)' }}>
                 <h2 className="font-display font-semibold text-white">Employees</h2>
               </div>
               <div className="flex-1 overflow-y-auto p-2">
@@ -137,9 +137,9 @@ export default function PayrollPage() {
                     onClick={() => viewSalary(emp)}
                     className="w-full flex items-center gap-3 rounded-xl px-3 py-3 mb-1 text-left transition-all"
                     style={selectedEmp?.id === emp.id ? {
-                      background:'rgba(139,92,246,0.15)',
+                      background:'var(--t-accent-glow-sm)',
                       boxShadow:'inset 2px 2px 6px rgba(0,0,0,0.35)',
-                      borderLeft:'3px solid #8B5CF6',
+                      borderLeft:'3px solid var(--t-accent-p)',
                     } : {
                       background:'transparent',
                       borderLeft:'3px solid transparent',
@@ -147,7 +147,7 @@ export default function PayrollPage() {
                   >
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white"
                       style={{
-                        background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
+                        background:'var(--t-accent-grad)',
                         boxShadow:'2px 2px 6px rgba(0,0,0,0.4)',
                       }}>
                       {emp.first_name?.[0]}{emp.last_name?.[0]}

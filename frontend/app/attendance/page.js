@@ -68,7 +68,7 @@ export default function AttendancePage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'rgba(192,132,252,0.6)' }}>
+            <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color:'var(--t-text-label)' }}>
               Records
             </p>
             <h1 className="font-display text-3xl font-bold text-white">Attendance</h1>
@@ -99,7 +99,7 @@ export default function AttendancePage() {
         </div>
 
         {msg && (
-          <div className="rounded-xl px-4 py-2.5 text-sm" style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', color:'#FCA5A5' }}>
+          <div className="rounded-xl px-4 py-2.5 text-sm" style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.25)', color:'#FCA5A5' }}>
             {msg}
           </div>
         )}
@@ -108,15 +108,19 @@ export default function AttendancePage() {
         {isAdmin && !loading && (
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label:'Total Records', value: records.length, icon: Clock, color:'#8B5CF6' },
-              { label:'Present', value: records.filter(r => r.status === 'present').length, icon: UserCheck, color:'#22C55E' },
+              { label:'Total Records', value: records.length, icon: Clock, color:'var(--t-accent-p)' },
+              { label:'Present', value: records.filter(r => r.status === 'present').length, icon: UserCheck, color:'#10B981' },
               { label:'Absent / Leave', value: records.filter(r => ['absent','on_leave'].includes(r.status)).length, icon: Clock, color:'#F59E0B' },
             ].map(s => {
               const Icon = s.icon;
+              const isAccent = s.color === 'var(--t-accent-p)';
               return (
                 <div key={s.label} className="glass-card p-4 flex items-center gap-3">
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg shrink-0"
-                    style={{ background:`${s.color}18`, boxShadow:`3px 3px 8px rgba(0,0,0,0.4), 0 0 8px ${s.color}25` }}>
+                    style={{
+                      background: isAccent ? 'var(--t-accent-glow-sm)' : s.color === '#10B981' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+                      boxShadow: `3px 3px 8px rgba(0,0,0,0.4), 0 0 8px ${isAccent ? 'var(--t-accent-glow-sm)' : s.color === '#10B981' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}`
+                    }}>
                     <Icon className="w-4 h-4" style={{ color:s.color }} />
                   </span>
                   <div>
@@ -135,19 +139,19 @@ export default function AttendancePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="glass-table-head">
-                  {isAdmin && <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Employee</th>}
-                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Date</th>
-                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Check In</th>
-                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Check Out</th>
-                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Work Hours</th>
-                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Extra</th>
-                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.6)' }}>Status</th>
+                  {isAdmin && <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Employee</th>}
+                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Date</th>
+                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Check In</th>
+                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Check Out</th>
+                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Work Hours</th>
+                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Extra</th>
+                  <th className="px-5 py-4 text-left text-xs font-semibold tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {loading && (
                   <tr><td colSpan={isAdmin ? 7 : 6} className="px-5 py-12 text-center">
-                    <div className="flex items-center justify-center gap-2" style={{ color:'rgba(192,132,252,0.5)' }}>
+                    <div className="flex items-center justify-center gap-2" style={{ color:'var(--t-text-label)' }}>
                       <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
@@ -167,7 +171,7 @@ export default function AttendancePage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
                           <div className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-white shrink-0"
-                            style={{ background:'linear-gradient(135deg,#8B5CF6,#C084FC)', boxShadow:'2px 2px 6px rgba(0,0,0,0.4)' }}>
+                            style={{ background:'var(--t-accent-grad)', boxShadow:'2px 2px 6px rgba(0,0,0,0.4)' }}>
                             {r.employees?.first_name?.[0]}{r.employees?.last_name?.[0]}
                           </div>
                           <span className="text-white font-medium text-sm">
@@ -178,7 +182,7 @@ export default function AttendancePage() {
                     )}
                     <td className="px-5 py-4 text-sm" style={{ color:'var(--t-text-muted)' }}>{r.attendance_date}</td>
                     <td className="px-5 py-4">
-                      <span className="font-mono text-sm" style={{ color: r.check_in ? '#22C55E' : 'var(--t-text-dim)' }}>
+                      <span className="font-mono text-sm" style={{ color: r.check_in ? '#10B981' : 'var(--t-text-dim)' }}>
                         {fmtTime(r.check_in)}
                       </span>
                     </td>
@@ -188,7 +192,7 @@ export default function AttendancePage() {
                       </span>
                     </td>
                     <td className="px-5 py-4 font-mono text-sm text-white">{r.work_hours ?? '—'}</td>
-                    <td className="px-5 py-4 font-mono text-sm" style={{ color:'rgba(192,132,252,0.8)' }}>{r.extra_hours ?? '—'}</td>
+                    <td className="px-5 py-4 font-mono text-sm" style={{ color:'var(--t-accent-s)' }}>{r.extra_hours ?? '—'}</td>
                     <td className="px-5 py-4"><StatusBadge value={r.status} /></td>
                   </tr>
                 ))}

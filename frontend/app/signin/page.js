@@ -69,12 +69,12 @@ export default function SignInPage() {
               <span
                 className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold text-white"
                 style={{
-                  background:'linear-gradient(135deg,#8B5CF6,#C084FC)',
-                  boxShadow:'0 4px 14px rgba(139,92,246,0.5), inset 0 1px 0 rgba(255,255,255,0.25)',
+                  background:'var(--t-accent-grad)',
+                  boxShadow:'0 4px 14px var(--t-accent-glow), inset 0 1px 0 rgba(255,255,255,0.25)',
                 }}
               >HR</span>
               <span className="font-display text-lg font-bold">
-                <span style={{color:'#C084FC'}}>Odoo</span>
+                <span style={{color:'var(--t-accent-s)'}}>Odoo</span>
                 <span className="text-white"> HRMS</span>
               </span>
             </div>
@@ -87,11 +87,11 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Login ID field */}
             <div>
-              <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.7)' }}>
+              <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
                 Login ID / Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'rgba(139,92,246,0.6)' }} />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'var(--t-accent-s)' }} />
                 <input
                   className="glass-input w-full pl-10 pr-4 py-3 text-sm"
                   placeholder="your@email.com"
@@ -104,11 +104,11 @@ export default function SignInPage() {
 
             {/* Password field */}
             <div>
-              <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'rgba(192,132,252,0.7)' }}>
+              <label className="block mb-1.5 text-xs font-medium tracking-widest uppercase" style={{ color:'var(--t-text-label)' }}>
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'rgba(139,92,246,0.6)' }} />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'var(--t-accent-s)' }} />
                 <input
                   type={showPw ? 'text' : 'password'}
                   className="glass-input w-full pl-10 pr-10 py-3 text-sm"
@@ -121,7 +121,7 @@ export default function SignInPage() {
                   type="button"
                   onClick={() => setShowPw(!showPw)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2"
-                  style={{ color:'rgba(139,92,246,0.6)' }}
+                  style={{ color:'var(--t-accent-s)' }}
                 >
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -165,7 +165,7 @@ export default function SignInPage() {
 
           <p className="mt-6 text-center text-sm" style={{ color:'var(--t-text-dim)' }}>
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-medium transition-colors hover:opacity-80" style={{ color:'#C084FC' }}>
+            <Link href="/signup" className="font-medium transition-colors hover:opacity-80" style={{ color:'var(--t-accent-s)' }}>
               Sign Up
             </Link>
           </p>

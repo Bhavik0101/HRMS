@@ -146,14 +146,11 @@ async function updateEmployee(req, res) {
 }
 
 // GET /api/employees/:id/salary  (Admin only per wireframe: "Salary Info tab should only be visible to Admin")
-async function getSalary(req, res) {
+  async function getSalary(req, res) {
   try {
     const { id } = req.params;
     if (!['admin', 'hr'].includes(req.user.role) && req.user.id !== id) {
       return res.status(403).json({ error: 'Not authorized to view this salary information' });
-    }
-    if (!['admin', 'hr'].includes(req.user.role)) {
-      return res.status(403).json({ error: 'Salary details are visible to Admin/HR only' });
     }
     const { data, error } = await supabase.from('salary_structures').select('*').eq('employee_id', id).single();
     if (error) throw error;

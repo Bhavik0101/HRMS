@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../../components/Navbar';
+import AppLayout from '../../components/AppLayout';
 import { api, getUser } from '../../lib/api';
 
 const statusColor = {
@@ -72,8 +72,7 @@ export default function DashboardPage() {
   const isAdmin = ['admin', 'hr'].includes(user.role);
 
   return (
-    <div className="min-h-screen bg-ink">
-      <Navbar />
+    <AppLayout>
       <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="flex items-center justify-between">
           <div>
@@ -150,7 +149,7 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppLayout>
   );
 }
 

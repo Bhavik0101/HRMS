@@ -71,4 +71,19 @@ export const api = {
   listTimeoffRequests: () => request('/timeoff/requests'),
   createTimeoffRequest: (body) => request('/timeoff/requests', { method: 'POST', body }),
   reviewTimeoffRequest: (id, body) => request(`/timeoff/requests/${id}`, { method: 'PATCH', body }),
+
+  uploadFile: async (file) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('hrms_token') : null;
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const res = await fetch(`${API_BASE}/upload`, {
+      method: 'POST',
+      headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to upload file');
+    return data;
+  },
 };

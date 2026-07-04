@@ -76,17 +76,27 @@ async function createRequest(req, res) {
   }
 }
 
-// GET /api/timeoff/requests  (Employee: own requests; Admin/HR: all requests for the company)
+// GET /api/timeoff/requests  (Employee: own requests + direct reports; Admin/HR: all requests for the company)
 async function listRequests(req, res) {
   try {
     const isAdmin = ['admin', 'hr'].includes(req.user.role);
+    const userId = req.user.id;
+
     let query = supabase
       .from('timeoff_requests')
-      .select('*, employees!timeoff_requests_employee_id_fkey(first_name,last_name,login_id,company_id)')
+      .select('*, employees!timeoff_requests_employee_id_fkey(first_name,last_name,login_id,company_id,manager_id)')
       .order('created_at', { ascending: false });
 
     if (!isAdmin) {
-      query = query.eq('employee_id', req.user.id);
+      // Find if this user has any direct reports
+      const { data: reports } = await supabase.from('employees').select('id').eq('manager_id', userId);
+      const reportIds = (reports || []).map((r) => r.id);
+      
+      if (reportIds.length > 0) {
+        query = query.or(`employee_id.eq.${userId},employee_id.in.(${reportIds.join(',')})`);
+      } else {
+        query = query.eq('employee_id', userId);
+      }
     }
 
     const { data, error } = await query;
@@ -112,10 +122,17 @@ async function reviewRequest(req, res) {
 
     const { data: reqRow, error: findErr } = await supabase
       .from('timeoff_requests')
-      .select('*')
+      .select('*, employees!timeoff_requests_employee_id_fkey(manager_id)')
       .eq('id', id)
       .single();
     if (findErr) throw findErr;
+
+    // Authorization Check
+    const isAdmin = ['admin', 'hr'].includes(req.user.role);
+    const isManager = reqRow.employees?.manager_id === req.user.id;
+    if (!isAdmin && !isManager) {
+      return res.status(403).json({ error: 'You are not authorized to review this request' });
+    }
 
     const { data, error } = await supabase
       .from('timeoff_requests')

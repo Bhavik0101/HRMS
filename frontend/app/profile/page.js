@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../../components/Navbar';
+import AppLayout from '../../components/AppLayout';
 import { api, getUser, setUser as saveUser } from '../../lib/api';
 
 export default function ProfilePage() {
@@ -67,9 +67,8 @@ export default function ProfilePage() {
   const isAdmin = ['admin', 'hr'].includes(user.role);
 
   return (
-    <div className="min-h-screen bg-ink">
-      <Navbar />
-      <div className="mx-auto max-w-4xl px-6 py-8">
+    <AppLayout>
+      <div className="mx-auto max-w-2xl px-6 py-8">
         <div className="flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent2 text-xl font-semibold text-white">
             {user.first_name?.[0]}
@@ -186,7 +185,7 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
-    </div>
+    </AppLayout>
   );
 }
 

@@ -13,6 +13,8 @@ router.use(authenticate);
 router.get('/allocation', getAllocation);
 router.get('/requests', listRequests);
 router.post('/requests', createRequest);
-router.patch('/requests/:id', requireAdminOrHr, reviewRequest);
+// We remove requireAdminOrHr here because a manager can also review their direct reports' requests.
+// Authorization will be handled inside the controller.
+router.patch('/requests/:id', reviewRequest);
 
 module.exports = router;

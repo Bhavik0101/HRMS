@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../../components/Navbar';
+import AppLayout from '../../components/AppLayout';
 import { api, getUser } from '../../lib/api';
 
 function fmtTime(iso) {
@@ -48,8 +48,7 @@ export default function AttendancePage() {
   const isAdmin = ['admin', 'hr'].includes(user.role);
 
   return (
-    <div className="min-h-screen bg-ink">
-      <Navbar />
+    <AppLayout>
       <div className="mx-auto max-w-4xl px-6 py-8">
         <h1 className="font-display text-2xl text-white">Attendance</h1>
 
@@ -112,6 +111,6 @@ export default function AttendancePage() {
           </table>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }
